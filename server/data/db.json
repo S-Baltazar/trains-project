@@ -1,9 +1,9 @@
 {
-  "coins": 14129,
+  "coins": 16804,
   "streak": 2,
-  "bestStreak": 3,
-  "totalAnswered": 38,
-  "totalCorrect": 16,
+  "bestStreak": 4,
+  "totalAnswered": 51,
+  "totalCorrect": 24,
   "upgrades": [
     "benches",
     "bench_curved",

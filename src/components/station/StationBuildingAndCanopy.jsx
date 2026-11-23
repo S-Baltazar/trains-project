@@ -297,13 +297,13 @@ export default function StationBuildingAndCanopy() {
         </mesh>
       </group>
 
-      {/* ANDÉN PRINCIPAL (06_modulo_anden_3d.jpg: subestructura oscura + losa clara en voladizo) */}
-      <mesh position={[5.8, 0.38, -3]} receiveShadow castShadow>
-        <boxGeometry args={[7.0, 0.76, 37.6]} />
+      {/* ANDÉN PRINCIPAL AGRANDADO (06_modulo_anden_3d.jpg) */}
+      <mesh position={[5.9, 0.38, -2]} receiveShadow castShadow>
+        <boxGeometry args={[7.4, 0.76, 43.6]} />
         <meshStandardMaterial color="#2b303a" roughness={0.85} />
       </mesh>
-      <mesh position={[5.6, 0.83, -3]} receiveShadow castShadow>
-        <boxGeometry args={[7.4, 0.14, 38]} />
+      <mesh position={[5.7, 0.83, -2]} receiveShadow castShadow>
+        <boxGeometry args={[7.8, 0.14, 44]} />
         <meshStandardMaterial map={concreteTex} color="#d4d7db" roughness={0.78} />
       </mesh>
       {/* Piso de conexión bajo los arcos y molinetes hacia el exterior */}
@@ -313,12 +313,12 @@ export default function StationBuildingAndCanopy() {
       </mesh>
 
       {/* Franja podotáctil + línea amarilla de seguridad */}
-      <mesh position={[2.22, 0.905, -3]} receiveShadow>
-        <boxGeometry args={[0.42, 0.015, 37.8]} />
+      <mesh position={[2.22, 0.905, -2]} receiveShadow>
+        <boxGeometry args={[0.42, 0.015, 43.8]} />
         <meshStandardMaterial map={tactileTex} color="#d6d3cd" roughness={0.8} />
       </mesh>
-      <mesh position={[2.0, 0.908, -3]} receiveShadow>
-        <boxGeometry args={[0.12, 0.016, 37.8]} />
+      <mesh position={[2.0, 0.908, -2]} receiveShadow>
+        <boxGeometry args={[0.12, 0.016, 43.8]} />
         <meshStandardMaterial color="#eab308" roughness={0.5} />
       </mesh>
 

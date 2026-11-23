@@ -530,3 +530,144 @@ export function getTransitMapTexture() {
     return tex;
   });
 }
+
+/**
+ * 01_colectivo_argentino.jpg
+ * Textura lateral realista del colectivo urbano argentino (blanco, franja celeste/azul, 3 puertas y ventanillas).
+ */
+export function getArgentineBusSideTexture() {
+  return getCached('arg_bus_side', () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+
+    // Carrocería blanca base
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(0, 0, 1024, 256);
+
+    // Zócalo inferior azul marino
+    ctx.fillStyle = '#1e3a8a';
+    ctx.fillRect(0, 198, 1024, 58);
+
+    // Franja azul + celeste intermedia
+    ctx.fillStyle = '#1e3a8a';
+    ctx.fillRect(0, 152, 1024, 14);
+    ctx.fillStyle = '#0ea5e9';
+    ctx.fillRect(0, 166, 1024, 14);
+
+    // Ventanillas oscuras
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(40, 32, 920, 106);
+
+    // Parantes blancos entre ventanillas
+    ctx.fillStyle = '#e2e8f0';
+    for (const px of [120, 260, 400, 560, 700, 840]) {
+      ctx.fillRect(px, 32, 12, 106);
+    }
+
+    // 3 Puertas plegadizas (trasera, central, delantera)
+    for (const dx of [145, 435, 865]) {
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(dx, 28, 76, 196);
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(dx + 8, 36, 26, 176);
+      ctx.fillRect(dx + 42, 36, 26, 176);
+    }
+
+    // Rejilla trasera de motor
+    ctx.fillStyle = '#475569';
+    for (let ry = 178; ry < 228; ry += 7) {
+      ctx.fillRect(24, ry, 52, 3);
+    }
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  });
+}
+
+/**
+ * 01_colectivo_argentino.jpg
+ * Frente del colectivo argentino con parabrisas, cartel de línea LED y máscara azul.
+ */
+export function getArgentineBusFrontTexture() {
+  return getCached('arg_bus_front', () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(0, 0, 256, 256);
+
+    // Cartel LED superior
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(36, 14, 184, 24);
+    ctx.fillStyle = '#fde047';
+    ctx.font = 'bold 14px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('136 • ESTACIÓN', 128, 31);
+
+    // Parabrisas doble
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(24, 46, 208, 114);
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(126, 46, 4, 114);
+
+    // Máscara azul inferior
+    ctx.fillStyle = '#1e3a8a';
+    ctx.fillRect(0, 178, 256, 78);
+    ctx.fillStyle = '#0ea5e9';
+    ctx.fillRect(0, 172, 256, 6);
+
+    // Parrilla frontal
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(68, 184, 120, 24);
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  });
+}
+
+/**
+ * 02_calle_asfalto_recta.jpg
+ * Textura de asfalto urbano con líneas de borde y línea discontinua central.
+ */
+export function getAsphaltRoadTexture() {
+  return getCached('asphalt_road', () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = '#2b2e33';
+    ctx.fillRect(0, 0, 512, 512);
+
+    // Granulado sutil del asfalto
+    for (let i = 0; i < 3200; i++) {
+      const x = (i * 67) % 512;
+      const y = (i * 113) % 512;
+      ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.08)';
+      ctx.fillRect(x, y, 3, 3);
+    }
+
+    // Líneas blancas continuas de borde
+    ctx.fillStyle = '#e2e8f0';
+    ctx.fillRect(22, 0, 10, 512);
+    ctx.fillRect(480, 0, 10, 512);
+
+    // Línea blanca discontinua central
+    for (let y = 16; y < 512; y += 96) {
+      ctx.fillRect(250, y, 12, 52);
+    }
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(1, 6);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  });
+}

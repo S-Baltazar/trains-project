@@ -19,6 +19,9 @@ import {
   WallBracketLantern,
 } from './StationFurniture.jsx';
 import {
+  getArgentineBusFrontTexture,
+  getArgentineBusSideTexture,
+  getAsphaltRoadTexture,
   getBallastTexture,
   getBrickTexture,
   getConcreteSlabTexture,
@@ -129,22 +132,22 @@ export function SecondPlatformAndBridge() {
         />
       </group>
 
-      {/* Segundo andén lateral en x = -9.2 (extendido a z = -22..+16 para recibir la escalera) */}
-      <group position={[-9.2, 0, -3]}>
+      {/* Segundo andén lateral agrandado en x = -9.4 (z = -24..+20) */}
+      <group position={[-9.5, 0, -2]}>
         <mesh position={[0, 0.38, 0]} receiveShadow castShadow>
-          <boxGeometry args={[4.4, 0.76, 37.6]} />
+          <boxGeometry args={[5.2, 0.76, 43.6]} />
           <meshStandardMaterial color="#2b303a" roughness={0.85} />
         </mesh>
         <mesh position={[0.1, 0.83, 0]} receiveShadow castShadow>
-          <boxGeometry args={[4.7, 0.14, 38]} />
+          <boxGeometry args={[5.5, 0.14, 44]} />
           <meshStandardMaterial map={concreteTex} color="#d4d7db" roughness={0.78} />
         </mesh>
-        <mesh position={[2.05, 0.905, 0]} receiveShadow>
-          <boxGeometry args={[0.38, 0.015, 37.8]} />
+        <mesh position={[2.45, 0.905, 0]} receiveShadow>
+          <boxGeometry args={[0.38, 0.015, 43.8]} />
           <meshStandardMaterial map={tactileTex} color="#d6d3cd" roughness={0.8} />
         </mesh>
-        <mesh position={[2.25, 0.908, 0]}>
-          <boxGeometry args={[0.12, 0.016, 37.8]} />
+        <mesh position={[2.65, 0.908, 0]}>
+          <boxGeometry args={[0.12, 0.016, 43.8]} />
           <meshStandardMaterial color="#eab308" roughness={0.5} />
         </mesh>
       </group>
@@ -344,10 +347,9 @@ function BridgePedestrians({ deckY }) {
 
 /**
  * 05_estacion_electrica.jpg
- * Subestación eléctrica modular con listones de madera, rejillas realistas, techo con LED
- * y patio lateral cercado con transformador y aisladores cerámicos.
+ * Subestación eléctrica modular ubicada SOBRE el extremo sur del segundo andén (y = 0.9).
  */
-export function ElectricalSubstation({ position = [-24.0, 0, -10] }) {
+export function ElectricalSubstation({ position = [-9.6, 0.9, 16.0] }) {
   const oakTex = useMemo(() => getWoodTexture('oak'), []);
   const concreteTex = useMemo(() => getConcreteSlabTexture(), []);
   const ventTex = useMemo(() => getVentGrilleTexture(), []);
@@ -447,12 +449,12 @@ export function ElectricalSubstation({ position = [-24.0, 0, -10] }) {
 
       <pointLight position={[2.2, 2.8, 0]} intensity={1.8} distance={8} color="#fde68a" />
 
-      {/* Cableado aéreo de alta tensión desde la subestación hacia la red de catenaria */}
+      {/* Cableado aéreo de alta tensión desde la subestación sobre el andén hacia la red de catenaria */}
       {[-0.42, 0, 0.42].map((ix, i) => (
         <OverheadPowerWire
           key={`pw-${i}`}
           start={[ix, 2.65, 2.35]}
-          end={[21.55, 4.75, -8 + i * 0.25]}
+          end={[7.15, 3.85, 2.0 + i * 0.25]}
         />
       ))}
     </group>
@@ -692,10 +694,11 @@ function BicycleRackWithBikes({ position = [0, 0, 0] }) {
 }
 
 /**
- * Zona exterior trasera conectada al andén principal y molinetes (sin muro de fondo).
+ * Zona exterior trasera conectada al andén principal y molinetes + calle asfaltada para el colectivo.
  */
 export function ExteriorBusAndBikePlaza() {
   const concreteTex = useMemo(() => getConcreteSlabTexture(), []);
+  const roadTex = useMemo(() => getAsphaltRoadTexture(), []);
 
   return (
     <group position={[15.0, 0, 0]}>
@@ -713,77 +716,130 @@ export function ExteriorBusAndBikePlaza() {
       ))}
 
       {/* Plaza exterior pavimentada */}
-      <mesh position={[0.6, 0.05, 0]} receiveShadow>
-        <boxGeometry args={[8.4, 0.12, 28]} />
+      <mesh position={[0.4, 0.05, 0]} receiveShadow>
+        <boxGeometry args={[8.0, 0.12, 28]} />
         <meshStandardMaterial map={concreteTex} color="#cbd5e1" roughness={0.85} />
       </mesh>
 
-      {/* Parada de Colectivos */}
-      <BusStopShelter position={[1.4, 0.11, 6.5]} />
+      {/* Parada de Colectivos junto al borde de la calle */}
+      <BusStopShelter position={[2.8, 0.11, 6.5]} />
 
       {/* Bicicletero con Bicicletas */}
       <BicycleRackWithBikes position={[1.3, 0.11, -6.5]} />
 
       {/* Canteros modulares con arbustos */}
       {[-11.8, -10.3, -1.6, 1.6, 10.3, 11.8].map((pz, i) => (
-        <ModularPlanterBox key={`planter-${i}`} position={[2.6, 0.11, pz]} variant={i} />
+        <ModularPlanterBox key={`planter-${i}`} position={[3.2, 0.11, pz]} variant={i} />
       ))}
 
-      {/* Colectivo urbano animado llegando a la parada */}
+      {/* 02_calle_asfalto_recta.jpg + 03_calle_asfalto_interseccion.jpg: Calle de asfalto para el colectivo */}
+      <group position={[7.3, 0, 0]}>
+        <mesh position={[0, 0.02, 0]} receiveShadow>
+          <boxGeometry args={[5.4, 0.06, 68]} />
+          <meshStandardMaterial map={roadTex} roughness={0.88} />
+        </mesh>
+        {/* Cordones de hormigón a ambos lados de la calle */}
+        {[-2.85, 2.85].map((cx) => (
+          <mesh key={`curb-${cx}`} position={[cx, 0.07, 0]} receiveShadow>
+            <boxGeometry args={[0.35, 0.14, 68]} />
+            <meshStandardMaterial map={concreteTex} color="#cbd5e1" roughness={0.85} />
+          </mesh>
+        ))}
+        {/* Vereda exterior opuesta */}
+        <mesh position={[3.8, 0.05, 0]} receiveShadow>
+          <boxGeometry args={[1.6, 0.12, 68]} />
+          <meshStandardMaterial map={concreteTex} color="#cbd5e1" roughness={0.85} />
+        </mesh>
+        {/* Sendas peatonales blancas (zebra crosswalks) */}
+        {[-12.5, 12.5].map((cz) => (
+          <group key={`zebra-${cz}`} position={[0, 0.055, cz]}>
+            {[-2.0, -1.2, -0.4, 0.4, 1.2, 2.0].map((sx, idx) => (
+              <mesh key={idx} position={[sx, 0, 0]}>
+                <boxGeometry args={[0.42, 0.01, 2.2]} />
+                <meshStandardMaterial color="#f1f5f9" roughness={0.7} />
+              </mesh>
+            ))}
+          </group>
+        ))}
+        {/* Rejillas de desagüe pluvial */}
+        {[-6, 10].map((dz) => (
+          <mesh key={`drain-${dz}`} position={[-2.45, 0.055, dz]}>
+            <boxGeometry args={[0.45, 0.02, 0.9]} />
+            <meshStandardMaterial color="#181b20" metalness={0.7} />
+          </mesh>
+        ))}
+      </group>
+
+      {/* Colectivo argentino animado circulando por la CALLE asfaltada (no por la plaza) */}
       <AnimatedCityBus />
     </group>
   );
 }
 
 /**
- * Colectivo urbano 3D que circula y se detiene brevemente en la parada exterior.
+ * 01_colectivo_argentino.jpg
+ * Colectivo urbano argentino con textura fiel que circula por la calle y se detiene en la parada.
  */
 function AnimatedCityBus() {
   const busRef = useRef(null);
+  const sideTex = useMemo(() => getArgentineBusSideTexture(), []);
+  const frontTex = useMemo(() => getArgentineBusFrontTexture(), []);
 
   useFrame(({ clock }) => {
     if (!busRef.current) return;
-    // Ciclo de 18 segundos: avanza, frena en z = 6.5 (parada), y sigue
+    // Ciclo de 18 segundos: avanza por la calle, frena en z = 6.5 (parada), y sigue
     const cycle = clock.getElapsedTime() % 18;
     let z;
     if (cycle < 6) {
-      z = -24 + (cycle / 6) * 30.5;
+      z = -28 + (cycle / 6) * 34.5;
     } else if (cycle < 11) {
       z = 6.5;
     } else {
-      z = 6.5 + ((cycle - 11) / 7) * 28;
+      z = 6.5 + ((cycle - 11) / 7) * 30;
     }
     busRef.current.position.z = z;
   });
 
   return (
-    <group ref={busRef} position={[3.9, 0.12, -20]}>
-      {/* Carrocería */}
-      <mesh position={[0, 1.35, 0]} castShadow>
-        <boxGeometry args={[1.95, 2.1, 6.2]} />
-        <meshStandardMaterial color="#0284c7" roughness={0.35} />
+    <group ref={busRef} position={[6.0, 0.05, -24]}>
+      {/* Carrocería con textura lateral argentina */}
+      <mesh position={[0, 1.42, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2.05, 2.15, 6.8]} />
+        <meshStandardMaterial map={sideTex} roughness={0.32} metalness={0.12} />
       </mesh>
-      <mesh position={[0, 2.2, 0]}>
-        <boxGeometry args={[1.97, 0.4, 6.22]} />
+      {/* Frente y contrafrente con parabrisas y cartel 136 */}
+      <mesh position={[0, 1.42, 3.41]}>
+        <planeGeometry args={[2.05, 2.15]} />
+        <meshStandardMaterial map={frontTex} roughness={0.3} />
+      </mesh>
+      {/* Techo blanco con unidad AC y escotillas */}
+      <mesh position={[0, 2.52, 0]} castShadow>
+        <boxGeometry args={[1.95, 0.08, 6.6]} />
         <meshStandardMaterial color="#f8fafc" roughness={0.4} />
       </mesh>
-      {/* Ventanas */}
-      <mesh position={[0, 1.65, 0.1]}>
-        <boxGeometry args={[1.98, 0.72, 5.6]} />
-        <meshStandardMaterial color="#0f172a" roughness={0.12} metalness={0.5} />
+      <mesh position={[0, 2.66, 0]} castShadow>
+        <boxGeometry args={[1.1, 0.22, 2.1]} />
+        <meshStandardMaterial color="#e2e8f0" roughness={0.4} />
       </mesh>
-      {/* Faros */}
-      {[-0.65, 0.65].map((hx) => (
-        <mesh key={hx} position={[hx, 0.75, 3.12]} rotation={[Math.PI / 2, 0, 0]}>
+      {/* Espejos retrovisores */}
+      {[-1.12, 1.12].map((mx) => (
+        <mesh key={mx} position={[mx, 1.75, 3.35]}>
+          <boxGeometry args={[0.14, 0.32, 0.1]} />
+          <meshStandardMaterial color="#181b20" />
+        </mesh>
+      ))}
+      {/* Faros delanteros */}
+      {[-0.72, 0.72].map((hx) => (
+        <mesh key={hx} position={[hx, 0.72, 3.43]} rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.1, 0.1, 0.04, 10]} />
-          <meshStandardMaterial color="#fef08a" emissive="#fde047" emissiveIntensity={2.0} />
+          <meshStandardMaterial color="#fef08a" emissive="#fde047" emissiveIntensity={2.2} />
         </mesh>
       ))}
       {/* 4 Ruedas */}
-      {[-0.95, 0.95].map((wx) =>
-        [-1.9, 1.9].map((wz) => (
-          <mesh key={`bw-${wx}-${wz}`} position={[wx, 0.35, wz]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.35, 0.35, 0.24, 14]} />
+      {[-0.98, 0.98].map((wx) =>
+        [-2.0, 2.0].map((wz) => (
+          <mesh key={`bw-${wx}-${wz}`} position={[wx, 0.36, wz]} rotation={[0, 0, Math.PI / 2]} castShadow>
+            <cylinderGeometry args={[0.36, 0.36, 0.24, 14]} />
             <meshStandardMaterial color="#111827" roughness={0.7} />
           </mesh>
         ))
