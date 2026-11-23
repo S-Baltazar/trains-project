@@ -21,6 +21,12 @@ const CAMERA_PRESETS = [
   { id: 'track', label: '🚆 Vía' },
 ];
 
+const WEATHER_LABELS = {
+  clear: '🌤️ Despejado',
+  rain: '🌧️ Lluvia',
+  rush: '⚡ Hora Pico',
+};
+
 const DIFFICULTIES = ['Todas', 'Fácil', 'Media', 'Difícil'];
 
 export default function HUD() {
@@ -30,6 +36,10 @@ export default function HUD() {
   const streak = useGameStore((s) => s.streak);
   const bestStreak = useGameStore((s) => s.bestStreak);
   const passiveIncomePerTrain = useGameStore((s) => s.passiveIncomePerTrain);
+  const stationLevel = useGameStore((s) => s.stationLevel);
+  const satisfaction = useGameStore((s) => s.satisfaction);
+  const weatherEvent = useGameStore((s) => s.weatherEvent);
+  const cycleWeather = useGameStore((s) => s.cycleWeather);
   const difficulty = useGameStore((s) => s.difficulty);
   const setDifficulty = useGameStore((s) => s.setDifficulty);
   const timeOfDay = useGameStore((s) => s.timeOfDay);
@@ -93,7 +103,12 @@ export default function HUD() {
     <>
       <header className="hud">
         <div className="hud-title-row">
-          <h1>Estación Trivia 3D</h1>
+          <div>
+            <h1>Estación Trivia 3D</h1>
+            <span className="station-level-tag">
+              Nv. {stationLevel.level} • {stationLevel.title} • 😊 {satisfaction.percent}% (x{satisfaction.multiplier})
+            </span>
+          </div>
           <span className={`dot ${serverOnline ? 'online' : 'offline'}`} title={serverOnline ? 'Backend conectado' : 'Backend desconectado'} />
         </div>
 
@@ -137,6 +152,9 @@ export default function HUD() {
         <div className="hud-toolbar">
           <button className="btn-mini" onClick={cycleTimeOfDay} title="Cambiar momento del día">
             {TIME_LABELS[timeOfDay]}
+          </button>
+          <button className="btn-mini" onClick={cycleWeather} title="Cambiar clima / evento">
+            {WEATHER_LABELS[weatherEvent]}
           </button>
           {CAMERA_PRESETS.map((cam) => (
             <button

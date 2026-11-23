@@ -4,6 +4,7 @@ import { OrbitControls } from '@react-three/drei';
 import StationEnvironment from './StationEnvironment.jsx';
 import Train from './Train.jsx';
 import Passengers from './Passengers.jsx';
+import WeatherEffects from './WeatherEffects.jsx';
 import { useGameStore } from '../store/gameStore.js';
 
 const SKY_THEMES = {
@@ -96,6 +97,7 @@ export default function StationCanvas() {
       <StationEnvironment />
       <Train />
       <Passengers />
+      <WeatherEffects />
       <CameraRig controlsRef={controlsRef} />
 
       <OrbitControls

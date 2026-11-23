@@ -96,6 +96,27 @@ const UPGRADE_CATALOG = [
     icon: '💐',
   },
   {
+    id: 'exterior_plaza',
+    name: 'Plaza Exterior y Parada',
+    description: 'Construye la plaza exterior con parada de colectivos, bicicletero cubierto y árboles.',
+    cost: 150,
+    icon: '🚌',
+  },
+  {
+    id: 'substation',
+    name: 'Subestación Eléctrica',
+    description: 'Instala transformadores y aisladores de alta tensión para alimentar la red ferroviaria.',
+    cost: 190,
+    icon: '⚡',
+  },
+  {
+    id: 'second_platform',
+    name: 'Doble Vía y Puente Peatonal',
+    description: 'Expande la estación con segunda vía, segundo andén y puente peatonal elevado.',
+    cost: 220,
+    icon: '🌉',
+  },
+  {
     id: 'express_train',
     name: 'Tren Expreso',
     description: 'Moderniza la locomotora y reduce el tiempo de espera entre trenes a 20s.',
@@ -142,7 +163,40 @@ const PASSIVE_INCOME_MAP = {
   cafe: 12,
   bookstore: 14,
   flower_shop: 16,
+  exterior_plaza: 10,
+  substation: 12,
+  second_platform: 20,
 };
+
+const STATION_LEVEL_TITLES = [
+  'Apeadero Rural',
+  'Parada Suburbana',
+  'Estación Local',
+  'Estación de Transbordo',
+  'Nodo Ferroviario',
+  'Terminal Regional',
+  'Estación Central',
+  'Estación Central Metropolitana',
+];
+
+function computeStationLevel(state) {
+  const score =
+    (state.totalCorrect || 0) * 2 +
+    (state.upgrades?.length || 0) * 5 +
+    ((state.unlockedTrains?.length || 1) - 1) * 8;
+  const level = Math.min(10, Math.floor(score / 12) + 1);
+  const title =
+    STATION_LEVEL_TITLES[Math.min(STATION_LEVEL_TITLES.length - 1, level - 1)];
+  return { level, title, score };
+}
+
+function computeSatisfaction(upgrades = []) {
+  const base = 35;
+  const bonus = Math.min(65, upgrades.length * 6);
+  const percent = base + bonus;
+  const multiplier = Number((1 + (percent - 35) / 130).toFixed(2)); // 1.00x a 1.50x
+  return { percent, multiplier };
+}
 
 const ACHIEVEMENT_DEFS = [
   {
@@ -253,6 +307,8 @@ function buildStationPayload(state) {
   const unlockedTrains = state.unlockedTrains || ['sarmiento'];
   const selectedTrain = state.selectedTrain || 'sarmiento';
   const unlockedAchievements = state.unlockedAchievements || [];
+  const stationLevel = computeStationLevel(state);
+  const satisfaction = computeSatisfaction(state.upgrades);
 
   return {
     coins: state.coins,
@@ -262,6 +318,8 @@ function buildStationPayload(state) {
     totalCorrect: state.totalCorrect,
     upgrades: state.upgrades,
     sandboxMode: Boolean(state.sandboxMode),
+    stationLevel,
+    satisfaction,
     passiveIncomePerTrain: computePassiveIncome(state.upgrades),
     catalog: UPGRADE_CATALOG.map((item) => ({
       ...item,
@@ -392,7 +450,9 @@ app.post('/api/trivia/answer', (req, res) => {
       Difícil: [55, 90],
     };
     const [minC, maxC] = ranges[difficulty] || ranges.Media;
-    baseCoins = Math.floor(Math.random() * (maxC - minC + 1)) + minC;
+    const rawBase = Math.floor(Math.random() * (maxC - minC + 1)) + minC;
+    const { multiplier } = computeSatisfaction(state.upgrades);
+    baseCoins = Math.round(rawBase * multiplier);
     streakBonus = Math.min(state.streak - 1, 10) * 5; // +5 por racha consecutiva
     totalEarned += baseCoins + streakBonus;
   } else {

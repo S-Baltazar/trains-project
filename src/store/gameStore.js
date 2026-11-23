@@ -30,6 +30,9 @@ export const useGameStore = create((set, get) => ({
   trainsCatalog: [],
   achievements: [],
   passiveIncomePerTrain: 0,
+  stationLevel: { level: 1, title: 'Apeadero Rural', score: 0 },
+  satisfaction: { percent: 35, multiplier: 1 },
+  weatherEvent: 'clear',
   serverOnline: true,
 
   // Trivia actual
@@ -85,6 +88,12 @@ export const useGameStore = create((set, get) => ({
 
   toggleMuted: () => set((s) => ({ muted: !s.muted })),
 
+  cycleWeather: () => {
+    const order = ['clear', 'rain', 'rush'];
+    const next = order[(order.indexOf(get().weatherEvent) + 1) % order.length];
+    set({ weatherEvent: next });
+  },
+
   fetchStation: async () => {
     try {
       const res = await fetch('/api/station');
@@ -103,6 +112,8 @@ export const useGameStore = create((set, get) => ({
         trainsCatalog: data.trainsCatalog || [],
         achievements: data.achievements || [],
         passiveIncomePerTrain: data.passiveIncomePerTrain || 0,
+        stationLevel: data.stationLevel || { level: 1, title: 'Apeadero Rural', score: 0 },
+        satisfaction: data.satisfaction || { percent: 35, multiplier: 1 },
         sandboxMode: Boolean(data.sandboxMode),
         serverOnline: true,
       });
@@ -192,7 +203,10 @@ export const useGameStore = create((set, get) => ({
       }
 
       const nextWave = data.correct
-        ? { id: Date.now(), count: Math.floor(Math.random() * 3) + 3 } // 3 a 5 pasajeros
+        ? {
+            id: Date.now(),
+            count: (Math.floor(Math.random() * 3) + 3) * (get().weatherEvent === 'rush' ? 2 : 1),
+          }
         : get().passengerWave;
 
       set({
@@ -207,6 +221,8 @@ export const useGameStore = create((set, get) => ({
         catalog: data.catalog,
         achievements: data.achievements || [],
         passiveIncomePerTrain: data.passiveIncomePerTrain || 0,
+        stationLevel: data.stationLevel || get().stationLevel,
+        satisfaction: data.satisfaction || get().satisfaction,
         passengerWave: nextWave,
         lastResult: {
           correct: data.correct,
@@ -260,6 +276,8 @@ export const useGameStore = create((set, get) => ({
         catalog: data.catalog,
         achievements: data.achievements || get().achievements,
         passiveIncomePerTrain: data.passiveIncomePerTrain ?? get().passiveIncomePerTrain,
+        stationLevel: data.stationLevel || get().stationLevel,
+        satisfaction: data.satisfaction || get().satisfaction,
       });
       playClickSound(get().muted);
       get().showToast(`¡Mejora desbloqueada: ${data.purchased.name}!`, 'success');
@@ -352,6 +370,8 @@ export const useGameStore = create((set, get) => ({
         trainsCatalog: data.trainsCatalog || [],
         achievements: data.achievements || [],
         passiveIncomePerTrain: data.passiveIncomePerTrain || 0,
+        stationLevel: data.stationLevel || { level: 1, title: 'Apeadero Rural', score: 0 },
+        satisfaction: data.satisfaction || { percent: 35, multiplier: 1 },
         sandboxMode: true,
         sandboxModalOpen: false,
       });

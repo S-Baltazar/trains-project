@@ -14,6 +14,11 @@ import {
   SlattedLinearBench,
   TurnstileGateSet,
 } from './station/StationFurniture.jsx';
+import {
+  ElectricalSubstation,
+  ExteriorBusAndBikePlaza,
+  SecondPlatformAndBridge,
+} from './station/StationInfrastructure.jsx';
 import { getBrickTexture, getClockFaceTexture } from './station/textures.js';
 
 /**
@@ -44,6 +49,9 @@ export default function StationEnvironment() {
   const hasTurnstiles = upgrades.includes('turnstiles');
   const hasBookstore = upgrades.includes('bookstore');
   const hasFlowerShop = upgrades.includes('flower_shop');
+  const hasExteriorPlaza = upgrades.includes('exterior_plaza');
+  const hasSubstation = upgrades.includes('substation');
+  const hasSecondPlatform = upgrades.includes('second_platform');
 
   return (
     <group>
@@ -108,6 +116,15 @@ export default function StationEnvironment() {
       {hasFlowerShop && (
         <FlowerShopPavilion position={[9.95, 0.9, 7.0]} rotation={[0, -Math.PI / 2, 0]} />
       )}
+
+      {/* MEJORA 11: Plaza Exterior, Parada de Colectivos y Bicicletero */}
+      {hasExteriorPlaza && <ExteriorBusAndBikePlaza />}
+
+      {/* MEJORA 12: Subestación Eléctrica */}
+      {hasSubstation && <ElectricalSubstation />}
+
+      {/* MEJORA 13: Segundo Andén, Doble Vía y Puente Peatonal */}
+      {hasSecondPlatform && <SecondPlatformAndBridge />}
 
       {/* MEJORA 8: Torre del Reloj sobre el edificio histórico */}
       {hasClockTower && (

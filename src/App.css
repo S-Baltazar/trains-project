@@ -666,3 +666,11 @@
   color: #cbd5e1;
   cursor: pointer;
 }
+
+.station-level-tag {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #7dd3fc;
+  margin-top: 0.15rem;
+}
