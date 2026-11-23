@@ -3,7 +3,17 @@ import { useFrame } from '@react-three/fiber';
 import { useGameStore } from '../../store/gameStore.js';
 import { TrainFormation } from '../Train.jsx';
 import {
+  ClassicLampPost,
+  CurvedErgonomicBench,
+  DepartureTotem,
+  HangingStationClock,
+  SlattedLinearBench,
+  SuspendedLinearLamp,
+  WallBracketLantern,
+} from './StationFurniture.jsx';
+import {
   getBallastTexture,
+  getBrickTexture,
   getConcreteSlabTexture,
   getDepartureScreenTexture,
   getTactileStripTexture,
@@ -112,28 +122,28 @@ export function SecondPlatformAndBridge() {
         />
       </group>
 
-      {/* Segundo andén lateral en x = -9.2 */}
-      <group position={[-9.2, 0, 0]}>
+      {/* Segundo andén lateral en x = -9.2 (extendido a z = -22..+16 para recibir la escalera) */}
+      <group position={[-9.2, 0, -3]}>
         <mesh position={[0, 0.38, 0]} receiveShadow castShadow>
-          <boxGeometry args={[4.4, 0.76, 28]} />
+          <boxGeometry args={[4.4, 0.76, 37.6]} />
           <meshStandardMaterial color="#2b303a" roughness={0.85} />
         </mesh>
         <mesh position={[0.1, 0.83, 0]} receiveShadow castShadow>
-          <boxGeometry args={[4.7, 0.14, 28.4]} />
+          <boxGeometry args={[4.7, 0.14, 38]} />
           <meshStandardMaterial map={concreteTex} color="#d4d7db" roughness={0.78} />
         </mesh>
         <mesh position={[2.05, 0.905, 0]} receiveShadow>
-          <boxGeometry args={[0.38, 0.015, 28.2]} />
+          <boxGeometry args={[0.38, 0.015, 37.8]} />
           <meshStandardMaterial map={tactileTex} color="#d6d3cd" roughness={0.8} />
         </mesh>
         <mesh position={[2.25, 0.908, 0]}>
-          <boxGeometry args={[0.12, 0.016, 28.2]} />
+          <boxGeometry args={[0.12, 0.016, 37.8]} />
           <meshStandardMaterial color="#eab308" roughness={0.5} />
         </mesh>
       </group>
 
-      {/* PUENTE PEATONAL ELEVADO (01_puente_peatonal_estacion.jpg) en z = -12.8 */}
-      <group position={[0, 0, -12.8]}>
+      {/* PUENTE PEATONAL ELEVADO (z = -15.6, libre del techo de cristal que termina en z = -12.5) */}
+      <group position={[0, 0, -15.6]}>
         {/* Tablero de hormigón */}
         <mesh position={[bridgeCenterX, deckY, 0]} castShadow receiveShadow>
           <boxGeometry args={[bridgeSpan, 0.26, 2.5]} />
@@ -204,11 +214,11 @@ export function SecondPlatformAndBridge() {
           </group>
         ))}
 
-        {/* Torres de ascensor y escaleras con escalones individuales 3D */}
+        {/* Torres de ascensor y escaleras orientadas hacia -Z (sin tocar el techo de cristal) */}
         {[5.1, -9.2].map((endX, idx) => (
           <group key={`tower-${idx}`} position={[endX, 0.9, 0]}>
-            {/* Torre de ascensor */}
-            <group position={[0, 0, -1.7]}>
+            {/* Torre de ascensor en +Z (z = -15.6 + 1.8 = -13.8, libre de -12.5) */}
+            <group position={[0, 0, 1.8]}>
               <mesh position={[0, 3.85, 0]} castShadow receiveShadow>
                 <boxGeometry args={[2.1, 7.7, 2.1]} />
                 <meshStandardMaterial map={oakTex} roughness={0.68} />
@@ -225,21 +235,19 @@ export function SecondPlatformAndBridge() {
                 <boxGeometry args={[2.3, 0.24, 2.3]} />
                 <meshStandardMaterial color="#1b1f24" metalness={0.65} roughness={0.38} />
               </mesh>
-              <mesh position={[0, 1.15, 1.06]}>
+              <mesh position={[0, 1.15, -1.06]}>
                 <boxGeometry args={[1.1, 2.1, 0.05]} />
                 <meshStandardMaterial color="#64748b" metalness={0.6} roughness={0.3} />
               </mesh>
             </group>
 
-            {/* Escalera con 18 escalones reales, zancas laterales y barandas vidriadas */}
-            <group position={[0, 0, 1.25]}>
-              {/* Descanso superior conectando con el tablero */}
+            {/* Escalera con 18 escalones reales descendiendo hacia -Z */}
+            <group position={[0, 0, -1.25]} rotation={[0, Math.PI, 0]}>
               <mesh position={[0, 4.8, -0.35]} castShadow receiveShadow>
                 <boxGeometry args={[1.9, 0.2, 0.8]} />
                 <meshStandardMaterial map={concreteTex} color="#cbd5e1" roughness={0.82} />
               </mesh>
 
-              {/* 18 Escalones individuales */}
               {stairSteps.map((st, sIdx) => (
                 <mesh
                   key={`step-${sIdx}`}
@@ -252,7 +260,6 @@ export function SecondPlatformAndBridge() {
                 </mesh>
               ))}
 
-              {/* Zancas laterales metálicas + barandas vidriadas + pasamanos de madera */}
               {[-0.9, 0.9].map((sz) => (
                 <group key={`srail-${sz}`}>
                   <mesh position={[sz, 2.42, 2.7]} rotation={[0.73, 0, 0]} castShadow>
@@ -270,7 +277,6 @@ export function SecondPlatformAndBridge() {
                 </group>
               ))}
 
-              {/* Pilar intermedio bajo la escalera */}
               <mesh position={[0, 1.25, 2.7]} castShadow>
                 <boxGeometry args={[0.24, 2.5, 0.24]} />
                 <meshStandardMaterial color="#1b1f24" metalness={0.7} roughness={0.38} />
@@ -640,6 +646,201 @@ export function ExteriorBusAndBikePlaza() {
       {[-11.8, -10.3, -1.6, 1.6, 10.3, 11.8].map((pz, i) => (
         <ModularPlanterBox key={`planter-${i}`} position={[2.6, 0.11, pz]} variant={i} />
       ))}
+    </group>
+  );
+}
+
+/**
+ * ESTACIÓN 2: Cubierta vidriada, columnas de fundición, arcos de ladrillo, reloj y faroles
+ * replicando exactamente la estética de la Estación 1 en el segundo andén (x = -9.2).
+ */
+export function Station2CanopyAndArches() {
+  const brickTex = useMemo(() => getBrickTexture(), []);
+  const canopyWidth = 4.6; // x = -11.4 a -6.8
+  const canopyLength = 25.0; // z = -12.5 a +12.5
+  const eaveY = 4.45;
+  const ridgeY = 5.15;
+  const halfSpan = canopyWidth / 2;
+  const slopeAngle = Math.atan2(ridgeY - eaveY, halfSpan);
+  const slopeLen = Math.hypot(halfSpan, ridgeY - eaveY);
+
+  const archSegments = useMemo(() => {
+    const segs = [];
+    const count = 11;
+    const radius = 2.15;
+    for (let i = 0; i < count; i++) {
+      const t = (i + 0.5) / count;
+      const angle = Math.PI * t;
+      segs.push({
+        z: Math.cos(angle) * radius,
+        y: Math.sin(angle) * radius,
+        rotX: angle - Math.PI / 2,
+        isKeystone: i === 5,
+      });
+    }
+    return segs;
+  }, []);
+
+  return (
+    <group>
+      {/* 3 Arcos de ladrillo y piedra en el fondo del segundo andén (x = -11.4) */}
+      {[-7, 0, 7].map((zc) => (
+        <group key={`s2-arch-${zc}`} position={[-11.4, 0.9, zc]}>
+          <mesh position={[-0.15, 4.35, 0]} castShadow receiveShadow>
+            <boxGeometry args={[0.45, 0.85, 5.2]} />
+            <meshStandardMaterial map={brickTex} roughness={0.88} />
+          </mesh>
+          <group position={[-0.05, 2.15, 0]}>
+            {archSegments.map((seg, idx) => (
+              <mesh
+                key={idx}
+                position={[seg.isKeystone ? 0.04 : 0, seg.y, seg.z]}
+                rotation={[seg.rotX, 0, 0]}
+                castShadow
+              >
+                <boxGeometry
+                  args={[
+                    seg.isKeystone ? 0.54 : 0.48,
+                    seg.isKeystone ? 0.52 : 0.42,
+                    seg.isKeystone ? 0.44 : 0.36,
+                  ]}
+                />
+                <meshStandardMaterial
+                  color={seg.isKeystone ? '#b8ad99' : idx % 2 === 0 ? '#8c4a38' : '#a89c88'}
+                  roughness={0.85}
+                />
+              </mesh>
+            ))}
+          </group>
+          <pointLight position={[0.9, 3.6, 0]} intensity={2.2} distance={8} color="#fde68a" />
+        </group>
+      ))}
+
+      {/* Pilastras de piedra entre los arcos y parapeto superior */}
+      {[-10.5, -3.5, 3.5, 10.5].map((pz) => (
+        <group key={`s2-pil-${pz}`} position={[-11.45, 0.9, pz]}>
+          <mesh position={[0, 0.55, 0]} castShadow receiveShadow>
+            <boxGeometry args={[0.85, 1.1, 1.8]} />
+            <meshStandardMaterial color="#a89d8a" roughness={0.85} />
+          </mesh>
+          <mesh position={[-0.1, 2.55, 0]} castShadow receiveShadow>
+            <boxGeometry args={[0.75, 3.0, 1.55]} />
+            <meshStandardMaterial color="#b3a794" roughness={0.82} />
+          </mesh>
+          <mesh position={[-0.05, 4.15, 0]} castShadow>
+            <boxGeometry args={[0.92, 0.26, 1.75]} />
+            <meshStandardMaterial color="#9c917e" roughness={0.85} />
+          </mesh>
+          <WallBracketLantern position={[0.45, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} />
+        </group>
+      ))}
+      <mesh position={[-11.6, 5.95, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.9, 0.9, 23.0]} />
+        <meshStandardMaterial map={brickTex} roughness={0.88} />
+      </mesh>
+      <mesh position={[-11.55, 6.48, 0]} castShadow>
+        <boxGeometry args={[1.1, 0.18, 23.3]} />
+        <meshStandardMaterial color="#b5aa97" roughness={0.82} />
+      </mesh>
+
+      {/* Columnas de fundición sobre el segundo andén */}
+      {[-10.5, -3.5, 3.5, 10.5].map((cz) => (
+        <group key={`s2-col-${cz}`} position={[-7.2, 0.9, cz]}>
+          <mesh position={[0, 0.14, 0]} castShadow>
+            <cylinderGeometry args={[0.2, 0.24, 0.28, 12]} />
+            <meshStandardMaterial color="#272b30" metalness={0.65} roughness={0.4} />
+          </mesh>
+          <mesh position={[0, 1.9, 0]} castShadow>
+            <cylinderGeometry args={[0.11, 0.13, 3.3, 12]} />
+            <meshStandardMaterial color="#2d3238" metalness={0.65} roughness={0.38} />
+          </mesh>
+          <mesh position={[0, 3.55, 0]} castShadow>
+            <cylinderGeometry args={[0.22, 0.12, 0.22, 12]} />
+            <meshStandardMaterial color="#272b30" metalness={0.65} roughness={0.4} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Vigas longitudinales con tiras LED cálidas */}
+      {[-11.4, -6.8].map((bx, i) => (
+        <group key={`s2-beam-${i}`} position={[bx, eaveY, 0]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.24, 0.32, canopyLength]} />
+            <meshStandardMaterial color="#2e343d" metalness={0.65} roughness={0.4} />
+          </mesh>
+          <mesh position={[0, -0.17, 0]}>
+            <boxGeometry args={[0.1, 0.03, canopyLength - 0.6]} />
+            <meshStandardMaterial color="#fef9c3" emissive="#fde68a" emissiveIntensity={1.6} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Cumbrera y cabriadas */}
+      <mesh position={[-9.1, ridgeY, 0]} castShadow>
+        <boxGeometry args={[0.2, 0.24, canopyLength]} />
+        <meshStandardMaterial color="#2e343d" metalness={0.65} roughness={0.4} />
+      </mesh>
+      {[-12, -8, -4, 0, 4, 8, 12].map((tz) => (
+        <group key={`s2-truss-${tz}`} position={[-9.1, 0, tz]}>
+          <mesh position={[0, eaveY + 0.05, 0]}>
+            <boxGeometry args={[canopyWidth - 0.2, 0.08, 0.08]} />
+            <meshStandardMaterial color="#2e343d" metalness={0.65} roughness={0.4} />
+          </mesh>
+          <mesh position={[-halfSpan / 2, (eaveY + ridgeY) / 2, 0]} rotation={[0, 0, slopeAngle]}>
+            <boxGeometry args={[slopeLen, 0.09, 0.09]} />
+            <meshStandardMaterial color="#2e343d" metalness={0.65} roughness={0.4} />
+          </mesh>
+          <mesh position={[halfSpan / 2, (eaveY + ridgeY) / 2, 0]} rotation={[0, 0, -slopeAngle]}>
+            <boxGeometry args={[slopeLen, 0.09, 0.09]} />
+            <meshStandardMaterial color="#2e343d" metalness={0.65} roughness={0.4} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Paneles de vidrio traslúcido a dos aguas */}
+      <mesh position={[-9.1 - halfSpan / 2, (eaveY + ridgeY) / 2 + 0.04, 0]} rotation={[0, 0, slopeAngle]}>
+        <boxGeometry args={[slopeLen, 0.04, canopyLength]} />
+        <meshStandardMaterial color="#bae6fd" transparent opacity={0.34} roughness={0.12} metalness={0.25} />
+      </mesh>
+      <mesh position={[-9.1 + halfSpan / 2, (eaveY + ridgeY) / 2 + 0.04, 0]} rotation={[0, 0, -slopeAngle]}>
+        <boxGeometry args={[slopeLen, 0.04, canopyLength]} />
+        <meshStandardMaterial color="#bae6fd" transparent opacity={0.34} roughness={0.12} metalness={0.25} />
+      </mesh>
+
+      {/* Reloj circular doble faz y luminarias lineales bajo la cubierta */}
+      <HangingStationClock position={[-9.1, 3.45, 0]} />
+      {[-8, -4, 4, 8].map((lz) => (
+        <SuspendedLinearLamp
+          key={`s2-lin-${lz}`}
+          position={[-9.1, 3.85, lz]}
+          rotation={[0, Math.PI / 2, 0]}
+          drop={0.65}
+        />
+      ))}
+    </group>
+  );
+}
+
+/**
+ * ESTACIÓN 2: Bancos de madera, farolas clásicas, tótems digitales y canteros en el segundo andén.
+ */
+export function Station2Furniture() {
+  return (
+    <group>
+      {/* Bancos lineales y curvos en el segundo andén */}
+      <SlattedLinearBench position={[-9.8, 0.9, -7.0]} />
+      <SlattedLinearBench position={[-9.8, 0.9, 7.0]} />
+      <CurvedErgonomicBench position={[-8.6, 0.9, -9.5]} rotation={[0, Math.PI, 0]} />
+      <CurvedErgonomicBench position={[-8.6, 0.9, 9.5]} rotation={[0, Math.PI, 0]} />
+
+      {/* Farolas clásicas en el borde del segundo andén */}
+      {[-11.5, -3.5, 3.5, 11.5].map((lz) => (
+        <ClassicLampPost key={`s2-lamp-${lz}`} position={[-7.3, 0.9, lz]} />
+      ))}
+
+      {/* Tótem de partidas */}
+      <DepartureTotem position={[-8.5, 0.9, -1.8]} />
+      <DepartureTotem position={[-8.5, 0.9, 11.8]} />
     </group>
   );
 }

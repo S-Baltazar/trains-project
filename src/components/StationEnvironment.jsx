@@ -18,6 +18,8 @@ import {
   ElectricalSubstation,
   ExteriorBusAndBikePlaza,
   SecondPlatformAndBridge,
+  Station2CanopyAndArches,
+  Station2Furniture,
 } from './station/StationInfrastructure.jsx';
 import { getBrickTexture, getClockFaceTexture } from './station/textures.js';
 
@@ -52,6 +54,8 @@ export default function StationEnvironment() {
   const hasExteriorPlaza = upgrades.includes('exterior_plaza');
   const hasSubstation = upgrades.includes('substation');
   const hasSecondPlatform = upgrades.includes('second_platform');
+  const hasStation2Canopy = upgrades.includes('station2_canopy');
+  const hasStation2Furniture = upgrades.includes('station2_furniture');
 
   return (
     <group>
@@ -125,6 +129,12 @@ export default function StationEnvironment() {
 
       {/* MEJORA 13: Segundo Andén, Doble Vía y Puente Peatonal */}
       {hasSecondPlatform && <SecondPlatformAndBridge />}
+
+      {/* MEJORA 14: Estación 2 - Cubierta, Arcos, Reloj y Faroles */}
+      {hasStation2Canopy && <Station2CanopyAndArches />}
+
+      {/* MEJORA 15: Estación 2 - Bancos, Farolas Clásicas y Tótems */}
+      {hasStation2Furniture && <Station2Furniture />}
 
       {/* MEJORA 8: Torre del Reloj sobre el edificio histórico */}
       {hasClockTower && (

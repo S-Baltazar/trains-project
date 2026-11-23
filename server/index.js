@@ -117,6 +117,20 @@ const UPGRADE_CATALOG = [
     icon: '🌉',
   },
   {
+    id: 'station2_canopy',
+    name: 'Estación 2: Cubierta y Arcos',
+    description: 'Construye arcos de ladrillo, techo de vidrio, faroles y reloj doble faz en el segundo andén.',
+    cost: 180,
+    icon: '🏛️',
+  },
+  {
+    id: 'station2_furniture',
+    name: 'Estación 2: Bancos, Farolas y Tótem',
+    description: 'Equipa el segundo andén con bancos de madera, farolas clásicas y tótem de partidas.',
+    cost: 120,
+    icon: '🪑',
+  },
+  {
     id: 'express_train',
     name: 'Tren Expreso',
     description: 'Moderniza la locomotora y reduce el tiempo de espera entre trenes a 20s.',
@@ -166,6 +180,8 @@ const PASSIVE_INCOME_MAP = {
   exterior_plaza: 10,
   substation: 12,
   second_platform: 20,
+  station2_canopy: 14,
+  station2_furniture: 10,
 };
 
 const STATION_LEVEL_TITLES = [
