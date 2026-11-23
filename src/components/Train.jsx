@@ -601,20 +601,11 @@ function GenericSilverCoach({ wheelRefs, wheelStartIdx, sideTex, roofTex }) {
 }
 
 /**
- * Modelo 3D del Tren activo (Sarmiento, Dos Pisos, Eléctrico Suburbano o Locomotora Diésel) animado en useFrame.
+ * Formación 3D reutilizable según el modelo de tren seleccionado.
  */
-export default function Train() {
-  const groupRef = useRef(null);
-  const wheelRefs = useRef([]);
-  const phase = useGameStore((s) => s.phase);
-  const upgrades = useGameStore((s) => s.upgrades);
-  const selectedTrain = useGameStore((s) => s.selectedTrain);
-  const onTrainArrived = useGameStore((s) => s.onTrainArrived);
-  const onTrainDeparted = useGameStore((s) => s.onTrainDeparted);
-
-  const isExpress = upgrades.includes('express_train');
-  const arrivalTriggeredRef = useRef(false);
-  const departureTriggeredRef = useRef(false);
+export function TrainFormation({ selectedTrain = 'sarmiento', isExpress = false, wheelRefs }) {
+  const localWheelRefs = useRef([]);
+  const activeWheelRefs = wheelRefs || localWheelRefs;
 
   const chevronTex = useMemo(() => createChevronTexture(), []);
   const logoTex = useMemo(
@@ -658,6 +649,145 @@ export default function Train() {
     dieselFrontTex,
     flutedCoachTex,
   ]);
+
+  const primaryBlue = isExpress ? '#0284c7' : '#1fa3e8';
+  const stripeColor = isExpress ? '#fef08a' : '#f8fafc';
+
+  if (selectedTrain === 'double_decker') {
+    return (
+      <>
+        <DoubleDeckerCar
+          isCabCar={true}
+          wheelRefs={activeWheelRefs}
+          wheelStartIdx={0}
+          sideTex={doubleDeckerSideTex}
+          roofTex={corrugatedWhiteRoofTex}
+        />
+        <mesh position={[0, 1.55, -5.85]} castShadow>
+          <boxGeometry args={[1.45, 1.7, 0.6]} />
+          <meshStandardMaterial color="#0f172a" roughness={0.85} />
+        </mesh>
+        <group position={[0, 0, -11.7]}>
+          <DoubleDeckerCar
+            isCabCar={false}
+            wheelRefs={activeWheelRefs}
+            wheelStartIdx={4}
+            sideTex={doubleDeckerSideTex}
+            roofTex={corrugatedWhiteRoofTex}
+          />
+        </group>
+      </>
+    );
+  }
+
+  if (selectedTrain === 'suburban_electric') {
+    return (
+      <>
+        <SuburbanElectricCar
+          isCabCar={true}
+          wheelRefs={activeWheelRefs}
+          wheelStartIdx={0}
+          sideTex={suburbanSideTex}
+          roofTex={corrugatedSilverRoofTex}
+        />
+        <mesh position={[0, 1.48, -5.85]} castShadow>
+          <boxGeometry args={[1.45, 1.65, 0.6]} />
+          <meshStandardMaterial color="#0f172a" roughness={0.85} />
+        </mesh>
+        <group position={[0, 0, -11.7]}>
+          <SuburbanElectricCar
+            isCabCar={false}
+            wheelRefs={activeWheelRefs}
+            wheelStartIdx={4}
+            sideTex={suburbanSideTex}
+            roofTex={corrugatedSilverRoofTex}
+          />
+        </group>
+      </>
+    );
+  }
+
+  if (selectedTrain === 'diesel_express') {
+    return (
+      <>
+        <DieselLocomotiveUnit
+          wheelRefs={activeWheelRefs}
+          sideTex={dieselSideTex}
+          frontTex={dieselFrontTex}
+        />
+        <mesh position={[0, 1.35, -5.85]} castShadow>
+          <boxGeometry args={[1.4, 1.5, 0.6]} />
+          <meshStandardMaterial color="#0f172a" roughness={0.85} />
+        </mesh>
+        <group position={[0, 0, -11.7]}>
+          <GenericSilverCoach
+            wheelRefs={activeWheelRefs}
+            wheelStartIdx={4}
+            sideTex={flutedCoachTex}
+            roofTex={corrugatedSilverRoofTex}
+          />
+        </group>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <group position={[0, 0, 0]}>
+        <PassengerCarBody
+          length={11.2}
+          primaryBlue={primaryBlue}
+          stripeColor={stripeColor}
+          isCabCar={true}
+          chevronTex={chevronTex}
+          logoTex={logoTex}
+          ledTex={ledTex}
+        />
+        <Bogie z={3.6} wheelRefs={activeWheelRefs} wheelStartIdx={0} />
+        <Bogie z={-3.6} wheelRefs={activeWheelRefs} wheelStartIdx={2} />
+      </group>
+
+      <mesh position={[0, 1.48, -5.85]} castShadow>
+        <boxGeometry args={[1.45, 1.65, 0.6]} />
+        <meshStandardMaterial color="#0f172a" roughness={0.85} />
+      </mesh>
+
+      <group position={[0, 0, -11.7]}>
+        <PassengerCarBody
+          length={11.2}
+          primaryBlue={primaryBlue}
+          stripeColor={stripeColor}
+          isCabCar={false}
+          chevronTex={chevronTex}
+          logoTex={logoTex}
+          ledTex={ledTex}
+        />
+        <Bogie z={3.6} wheelRefs={activeWheelRefs} wheelStartIdx={4} />
+        <Bogie z={-3.6} wheelRefs={activeWheelRefs} wheelStartIdx={6} />
+        <mesh position={[0, 1.48, -5.75]} castShadow>
+          <boxGeometry args={[1.45, 1.65, 0.35]} />
+          <meshStandardMaterial color="#0f172a" roughness={0.85} />
+        </mesh>
+      </group>
+    </>
+  );
+}
+
+/**
+ * Modelo 3D del Tren activo (Sarmiento, Dos Pisos, Eléctrico Suburbano o Locomotora Diésel) animado en useFrame.
+ */
+export default function Train() {
+  const groupRef = useRef(null);
+  const wheelRefs = useRef([]);
+  const phase = useGameStore((s) => s.phase);
+  const upgrades = useGameStore((s) => s.upgrades);
+  const selectedTrain = useGameStore((s) => s.selectedTrain);
+  const onTrainArrived = useGameStore((s) => s.onTrainArrived);
+  const onTrainDeparted = useGameStore((s) => s.onTrainDeparted);
+
+  const isExpress = upgrades.includes('express_train');
+  const arrivalTriggeredRef = useRef(false);
+  const departureTriggeredRef = useRef(false);
 
   useFrame((_state, delta) => {
     const group = groupRef.current;
@@ -703,121 +833,13 @@ export default function Train() {
     }
   });
 
-  const primaryBlue = isExpress ? '#0284c7' : '#1fa3e8';
-  const stripeColor = isExpress ? '#fef08a' : '#f8fafc';
-
   return (
     <group ref={groupRef} position={[0, 0.25, ENTRY_Z]}>
-      {selectedTrain === 'double_decker' ? (
-        <>
-          <DoubleDeckerCar
-            isCabCar={true}
-            wheelRefs={wheelRefs}
-            wheelStartIdx={0}
-            sideTex={doubleDeckerSideTex}
-            roofTex={corrugatedWhiteRoofTex}
-          />
-          <mesh position={[0, 1.55, -5.85]} castShadow>
-            <boxGeometry args={[1.45, 1.7, 0.6]} />
-            <meshStandardMaterial color="#0f172a" roughness={0.85} />
-          </mesh>
-          <group position={[0, 0, -11.7]}>
-            <DoubleDeckerCar
-              isCabCar={false}
-              wheelRefs={wheelRefs}
-              wheelStartIdx={4}
-              sideTex={doubleDeckerSideTex}
-              roofTex={corrugatedWhiteRoofTex}
-            />
-          </group>
-        </>
-      ) : selectedTrain === 'suburban_electric' ? (
-        <>
-          <SuburbanElectricCar
-            isCabCar={true}
-            wheelRefs={wheelRefs}
-            wheelStartIdx={0}
-            sideTex={suburbanSideTex}
-            roofTex={corrugatedSilverRoofTex}
-          />
-          <mesh position={[0, 1.48, -5.85]} castShadow>
-            <boxGeometry args={[1.45, 1.65, 0.6]} />
-            <meshStandardMaterial color="#0f172a" roughness={0.85} />
-          </mesh>
-          <group position={[0, 0, -11.7]}>
-            <SuburbanElectricCar
-              isCabCar={false}
-              wheelRefs={wheelRefs}
-              wheelStartIdx={4}
-              sideTex={suburbanSideTex}
-              roofTex={corrugatedSilverRoofTex}
-            />
-          </group>
-        </>
-      ) : selectedTrain === 'diesel_express' ? (
-        <>
-          <DieselLocomotiveUnit
-            wheelRefs={wheelRefs}
-            sideTex={dieselSideTex}
-            frontTex={dieselFrontTex}
-          />
-          <mesh position={[0, 1.35, -5.85]} castShadow>
-            <boxGeometry args={[1.4, 1.5, 0.6]} />
-            <meshStandardMaterial color="#0f172a" roughness={0.85} />
-          </mesh>
-          <group position={[0, 0, -11.7]}>
-            <GenericSilverCoach
-              wheelRefs={wheelRefs}
-              wheelStartIdx={4}
-              sideTex={flutedCoachTex}
-              roofTex={corrugatedSilverRoofTex}
-            />
-          </group>
-        </>
-      ) : (
-        <>
-          {/* Coche Cabina Delantero (M4 / M23) */}
-          <group position={[0, 0, 0]}>
-            <PassengerCarBody
-              length={11.2}
-              primaryBlue={primaryBlue}
-              stripeColor={stripeColor}
-              isCabCar={true}
-              chevronTex={chevronTex}
-              logoTex={logoTex}
-              ledTex={ledTex}
-            />
-            <Bogie z={3.6} wheelRefs={wheelRefs} wheelStartIdx={0} />
-            <Bogie z={-3.6} wheelRefs={wheelRefs} wheelStartIdx={2} />
-          </group>
-
-          {/* Fuelle negro de interconexión entre coches */}
-          <mesh position={[0, 1.48, -5.85]} castShadow>
-            <boxGeometry args={[1.45, 1.65, 0.6]} />
-            <meshStandardMaterial color="#0f172a" roughness={0.85} />
-          </mesh>
-
-          {/* Segundo Coche de Pasajeros */}
-          <group position={[0, 0, -11.7]}>
-            <PassengerCarBody
-              length={11.2}
-              primaryBlue={primaryBlue}
-              stripeColor={stripeColor}
-              isCabCar={false}
-              chevronTex={chevronTex}
-              logoTex={logoTex}
-              ledTex={ledTex}
-            />
-            <Bogie z={3.6} wheelRefs={wheelRefs} wheelStartIdx={4} />
-            <Bogie z={-3.6} wheelRefs={wheelRefs} wheelStartIdx={6} />
-            {/* Fuelle trasero */}
-            <mesh position={[0, 1.48, -5.75]} castShadow>
-              <boxGeometry args={[1.45, 1.65, 0.35]} />
-              <meshStandardMaterial color="#0f172a" roughness={0.85} />
-            </mesh>
-          </group>
-        </>
-      )}
+      <TrainFormation
+        selectedTrain={selectedTrain}
+        isExpress={isExpress}
+        wheelRefs={wheelRefs}
+      />
     </group>
   );
 }

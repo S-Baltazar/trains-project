@@ -1,21 +1,33 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useGameStore } from '../../store/gameStore.js';
+import { TrainFormation } from '../Train.jsx';
 import {
   getBallastTexture,
   getConcreteSlabTexture,
+  getDepartureScreenTexture,
+  getTactileStripTexture,
+  getVentGrilleTexture,
   getWoodTexture,
 } from './textures.js';
 
 /**
  * 01_puente_peatonal_estacion.jpg
- * Segunda vía paralela, segundo andén y puente peatonal cubierto con torres de ascensor,
- * listones de madera, cerchas diagonales, arcos inferiores y escaleras con baranda de vidrio.
+ * Segunda vía paralela con el mismo modelo de tren seleccionado, segundo andén y
+ * puente peatonal cubierto con escalones reales, torres de ascensor, listones de madera y cerchas.
  */
 export function SecondPlatformAndBridge() {
   const ballastTex = useMemo(() => getBallastTexture(), []);
   const concreteTex = useMemo(() => getConcreteSlabTexture(), []);
+  const tactileTex = useMemo(() => getTactileStripTexture(), []);
   const oakTex = useMemo(() => getWoodTexture('oak'), []);
+
+  const selectedTrain = useGameStore((s) => s.selectedTrain);
+  const upgrades = useGameStore((s) => s.upgrades);
+  const isExpress = upgrades.includes('express_train');
+
   const secondaryTrainRef = useRef(null);
+  const secondaryWheelRefs = useRef([]);
 
   const sleeperPositions = useMemo(() => {
     const arr = [];
@@ -23,11 +35,34 @@ export function SecondPlatformAndBridge() {
     return arr;
   }, []);
 
-  useFrame(({ clock }) => {
+  // 18 escalones reales por escalera para poder cruzar el puente
+  const stairSteps = useMemo(() => {
+    const count = 18;
+    const totalRise = 4.85;
+    const totalRun = 5.4;
+    const arr = [];
+    for (let i = 0; i < count; i++) {
+      const t = (i + 0.5) / count;
+      arr.push({
+        y: totalRise * (1 - t),
+        z: totalRun * t,
+        rise: totalRise / count,
+        run: totalRun / count + 0.04,
+      });
+    }
+    return arr;
+  }, []);
+
+  useFrame(({ clock }, delta) => {
     if (!secondaryTrainRef.current) return;
     const t = clock.getElapsedTime();
-    const z = ((t * 14) % 140) - 70;
+    const speed = isExpress ? 18 : 13;
+    const z = ((t * speed) % 140) - 70;
     secondaryTrainRef.current.position.z = -z;
+
+    for (const wheel of secondaryWheelRefs.current) {
+      if (wheel) wheel.rotation.x -= speed * Math.min(delta, 0.05) * 0.9;
+    }
   });
 
   const bridgeSpan = 14.3; // x = -9.2 a +5.1
@@ -47,10 +82,18 @@ export function SecondPlatformAndBridge() {
           <meshStandardMaterial map={ballastTex} roughness={0.95} />
         </mesh>
         {sleeperPositions.map((z, idx) => (
-          <mesh key={`s2-${z}`} position={[0, 0.15, z]} receiveShadow>
-            <boxGeometry args={[2.6, 0.08, 0.3]} />
-            <meshStandardMaterial color={idx % 3 === 0 ? '#7c5836' : '#cbd5e1'} roughness={0.85} />
-          </mesh>
+          <group key={`s2-${z}`} position={[0, 0.15, z]}>
+            <mesh receiveShadow>
+              <boxGeometry args={[2.6, 0.08, 0.3]} />
+              <meshStandardMaterial color={idx % 3 === 0 ? '#7c5836' : '#cbd5e1'} roughness={0.85} />
+            </mesh>
+            {[-1.0, 1.0].map((fx) => (
+              <mesh key={fx} position={[fx, 0.045, 0]}>
+                <boxGeometry args={[0.2, 0.02, 0.22]} />
+                <meshStandardMaterial color="#334155" metalness={0.6} />
+              </mesh>
+            ))}
+          </group>
         ))}
         {[-1.0, 1.0].map((rx) => (
           <mesh key={`r2-${rx}`} position={[rx, 0.23, 0]} castShadow>
@@ -60,20 +103,13 @@ export function SecondPlatformAndBridge() {
         ))}
       </group>
 
-      {/* Tren secundario pasante en la segunda vía */}
-      <group ref={secondaryTrainRef} position={[-4.6, 0.25, 0]}>
-        {[0, -11.6].map((cz, i) => (
-          <group key={i} position={[0, 0, cz]}>
-            <mesh position={[0, 1.45, 0]} castShadow>
-              <boxGeometry args={[2.3, 1.65, 11.0]} />
-              <meshStandardMaterial color="#0284c7" roughness={0.35} />
-            </mesh>
-            <mesh position={[0, 1.65, 0]}>
-              <boxGeometry args={[2.32, 0.6, 10.4]} />
-              <meshStandardMaterial color="#0f172a" roughness={0.15} />
-            </mesh>
-          </group>
-        ))}
+      {/* Tren secundario pasante con el MISMO modelo seleccionado por el jugador */}
+      <group ref={secondaryTrainRef} position={[-4.6, 0.25, 0]} rotation={[0, Math.PI, 0]}>
+        <TrainFormation
+          selectedTrain={selectedTrain}
+          isExpress={isExpress}
+          wheelRefs={secondaryWheelRefs}
+        />
       </group>
 
       {/* Segundo andén lateral en x = -9.2 */}
@@ -86,6 +122,10 @@ export function SecondPlatformAndBridge() {
           <boxGeometry args={[4.7, 0.14, 28.4]} />
           <meshStandardMaterial map={concreteTex} color="#d4d7db" roughness={0.78} />
         </mesh>
+        <mesh position={[2.05, 0.905, 0]} receiveShadow>
+          <boxGeometry args={[0.38, 0.015, 28.2]} />
+          <meshStandardMaterial map={tactileTex} color="#d6d3cd" roughness={0.8} />
+        </mesh>
         <mesh position={[2.25, 0.908, 0]}>
           <boxGeometry args={[0.12, 0.016, 28.2]} />
           <meshStandardMaterial color="#eab308" roughness={0.5} />
@@ -94,7 +134,7 @@ export function SecondPlatformAndBridge() {
 
       {/* PUENTE PEATONAL ELEVADO (01_puente_peatonal_estacion.jpg) en z = -12.8 */}
       <group position={[0, 0, -12.8]}>
-        {/* Tablero de hormigón y estructura de cercha */}
+        {/* Tablero de hormigón */}
         <mesh position={[bridgeCenterX, deckY, 0]} castShadow receiveShadow>
           <boxGeometry args={[bridgeSpan, 0.26, 2.5]} />
           <meshStandardMaterial map={concreteTex} color="#cbd5e1" roughness={0.8} />
@@ -109,11 +149,14 @@ export function SecondPlatformAndBridge() {
           <boxGeometry args={[bridgeSpan + 2.4, 0.05, 2.8]} />
           <meshStandardMaterial map={oakTex} roughness={0.65} />
         </mesh>
+        <mesh position={[bridgeCenterX, deckY + 2.48, 0]}>
+          <boxGeometry args={[bridgeSpan + 1.8, 0.03, 0.1]} />
+          <meshStandardMaterial color="#fef9c3" emissive="#fde68a" emissiveIntensity={1.6} />
+        </mesh>
 
-        {/* Cerchas metálicas diagonales + baranda vidriada a ambos lados del puente */}
+        {/* Cerchas metálicas diagonales + baranda vidriada a ambos lados */}
         {[-1.22, 1.22].map((bz) => (
           <group key={`truss-${bz}`} position={[bridgeCenterX, deckY, bz]}>
-            {/* Cordón inferior y superior */}
             <mesh position={[0, 0.05, 0]}>
               <boxGeometry args={[bridgeSpan, 0.16, 0.12]} />
               <meshStandardMaterial color="#1b1f24" metalness={0.7} roughness={0.38} />
@@ -122,12 +165,10 @@ export function SecondPlatformAndBridge() {
               <boxGeometry args={[bridgeSpan, 0.16, 0.12]} />
               <meshStandardMaterial color="#1b1f24" metalness={0.7} roughness={0.38} />
             </mesh>
-            {/* Baranda de vidrio */}
             <mesh position={[0, 0.65, 0]}>
               <boxGeometry args={[bridgeSpan - 0.6, 1.05, 0.04]} />
               <meshStandardMaterial color="#bae6fd" transparent opacity={0.35} roughness={0.1} />
             </mesh>
-            {/* Montantes verticales y diagonales Warren */}
             {[-5.4, -3.6, -1.8, 0, 1.8, 3.6, 5.4].map((vx, i) => (
               <group key={i} position={[vx, 1.3, 0]}>
                 <mesh>
@@ -148,7 +189,7 @@ export function SecondPlatformAndBridge() {
           </group>
         ))}
 
-        {/* Arcos curvos de apoyo bajo los extremos del puente */}
+        {/* Arcos de apoyo bajo los extremos del puente */}
         {[
           { x: 3.9, rotY: 0 },
           { x: -8.0, rotY: Math.PI },
@@ -163,19 +204,15 @@ export function SecondPlatformAndBridge() {
           </group>
         ))}
 
-        {/* Torres de ascensor con revestimiento de listones de madera y escaleras */}
-        {[
-          { x: 5.1, stairDir: 1 },
-          { x: -9.2, stairDir: 1 },
-        ].map((end, idx) => (
-          <group key={`tower-${idx}`} position={[end.x, 0.9, 0]}>
-            {/* Torre de ascensor detrás del puente (z = -1.6) */}
+        {/* Torres de ascensor y escaleras con escalones individuales 3D */}
+        {[5.1, -9.2].map((endX, idx) => (
+          <group key={`tower-${idx}`} position={[endX, 0.9, 0]}>
+            {/* Torre de ascensor */}
             <group position={[0, 0, -1.7]}>
               <mesh position={[0, 3.85, 0]} castShadow receiveShadow>
                 <boxGeometry args={[2.1, 7.7, 2.1]} />
                 <meshStandardMaterial map={oakTex} roughness={0.68} />
               </mesh>
-              {/* Estructura metálica exterior de la torre */}
               {[-1.05, 1.05].map((cx) =>
                 [-1.05, 1.05].map((cz) => (
                   <mesh key={`tc-${cx}-${cz}`} position={[cx, 3.85, cz]}>
@@ -184,36 +221,57 @@ export function SecondPlatformAndBridge() {
                   </mesh>
                 ))
               )}
-              {/* Cornisa superior oscura */}
               <mesh position={[0, 7.78, 0]} castShadow>
                 <boxGeometry args={[2.3, 0.24, 2.3]} />
                 <meshStandardMaterial color="#1b1f24" metalness={0.65} roughness={0.38} />
               </mesh>
-              {/* Puerta de ascensor metálica en la base */}
               <mesh position={[0, 1.15, 1.06]}>
                 <boxGeometry args={[1.1, 2.1, 0.05]} />
                 <meshStandardMaterial color="#64748b" metalness={0.6} roughness={0.3} />
               </mesh>
             </group>
 
-            {/* Escalera con descanso y baranda vidriada hacia +Z */}
-            <group position={[0, 0, 1.3]}>
-              <mesh position={[0, 2.45, 2.35]} rotation={[0.68, 0, 0]} castShadow receiveShadow>
-                <boxGeometry args={[1.8, 0.22, 7.4]} />
+            {/* Escalera con 18 escalones reales, zancas laterales y barandas vidriadas */}
+            <group position={[0, 0, 1.25]}>
+              {/* Descanso superior conectando con el tablero */}
+              <mesh position={[0, 4.8, -0.35]} castShadow receiveShadow>
+                <boxGeometry args={[1.9, 0.2, 0.8]} />
                 <meshStandardMaterial map={concreteTex} color="#cbd5e1" roughness={0.82} />
               </mesh>
-              {[-0.88, 0.88].map((sz) => (
+
+              {/* 18 Escalones individuales */}
+              {stairSteps.map((st, sIdx) => (
                 <mesh
-                  key={`sr-${sz}`}
-                  position={[sz, 3.05, 2.35]}
-                  rotation={[0.68, 0, 0]}
+                  key={`step-${sIdx}`}
+                  position={[0, st.y, st.z]}
+                  castShadow
+                  receiveShadow
                 >
-                  <boxGeometry args={[0.05, 0.95, 7.4]} />
-                  <meshStandardMaterial color="#bae6fd" transparent opacity={0.38} roughness={0.1} />
+                  <boxGeometry args={[1.76, st.rise + 0.04, st.run]} />
+                  <meshStandardMaterial map={concreteTex} color="#d4d7db" roughness={0.78} />
                 </mesh>
               ))}
+
+              {/* Zancas laterales metálicas + barandas vidriadas + pasamanos de madera */}
+              {[-0.9, 0.9].map((sz) => (
+                <group key={`srail-${sz}`}>
+                  <mesh position={[sz, 2.42, 2.7]} rotation={[0.73, 0, 0]} castShadow>
+                    <boxGeometry args={[0.08, 0.24, 7.3]} />
+                    <meshStandardMaterial color="#1b1f24" metalness={0.7} roughness={0.38} />
+                  </mesh>
+                  <mesh position={[sz, 2.98, 2.7]} rotation={[0.73, 0, 0]}>
+                    <boxGeometry args={[0.04, 0.92, 7.3]} />
+                    <meshStandardMaterial color="#bae6fd" transparent opacity={0.35} roughness={0.1} />
+                  </mesh>
+                  <mesh position={[sz, 3.46, 2.7]} rotation={[0.73, 0, 0]}>
+                    <boxGeometry args={[0.06, 0.06, 7.35]} />
+                    <meshStandardMaterial map={oakTex} roughness={0.6} />
+                  </mesh>
+                </group>
+              ))}
+
               {/* Pilar intermedio bajo la escalera */}
-              <mesh position={[0, 1.25, 2.6]} castShadow>
+              <mesh position={[0, 1.25, 2.7]} castShadow>
                 <boxGeometry args={[0.24, 2.5, 0.24]} />
                 <meshStandardMaterial color="#1b1f24" metalness={0.7} roughness={0.38} />
               </mesh>
@@ -229,12 +287,13 @@ export function SecondPlatformAndBridge() {
 
 /**
  * 05_estacion_electrica.jpg
- * Subestación eléctrica modular con listones de madera, rejillas superiores, techo con LED
+ * Subestación eléctrica modular con listones de madera, rejillas realistas, techo con LED
  * y patio lateral cercado con transformador y aisladores cerámicos.
  */
 export function ElectricalSubstation({ position = [-14.2, 0, -9] }) {
   const oakTex = useMemo(() => getWoodTexture('oak'), []);
   const concreteTex = useMemo(() => getConcreteSlabTexture(), []);
+  const ventTex = useMemo(() => getVentGrilleTexture(), []);
 
   return (
     <group position={position}>
@@ -244,17 +303,21 @@ export function ElectricalSubstation({ position = [-14.2, 0, -9] }) {
         <meshStandardMaterial map={concreteTex} color="#cbd5e1" roughness={0.85} />
       </mesh>
 
-      {/* Edificio modular de la subestación (z = -1.15) */}
+      {/* Edificio modular de la subestación */}
       <group position={[0, 0.28, -1.15]}>
-        {/* Cuerpo principal con listones verticales de madera */}
         <mesh position={[0, 1.45, 0]} castShadow receiveShadow>
           <boxGeometry args={[3.2, 2.9, 4.6]} />
           <meshStandardMaterial map={oakTex} roughness={0.68} />
         </mesh>
-        {/* Franja superior oscura de rejillas de ventilación */}
+        {/* Franja superior con textura de rejillas */}
         <mesh position={[0, 2.62, 0]}>
           <boxGeometry args={[3.24, 0.48, 4.64]} />
-          <meshStandardMaterial color="#1b1f24" metalness={0.55} roughness={0.45} />
+          <meshStandardMaterial map={ventTex} color="#272b30" metalness={0.55} roughness={0.45} />
+        </mesh>
+        {/* Rejilla de ventilación inferior */}
+        <mesh position={[1.62, 0.55, 0.9]}>
+          <boxGeometry args={[0.04, 0.48, 0.9]} />
+          <meshStandardMaterial map={ventTex} metalness={0.5} roughness={0.45} />
         </mesh>
         {/* Columnas metálicas esquineras */}
         {[-1.58, 1.58].map((cx) =>
@@ -265,7 +328,7 @@ export function ElectricalSubstation({ position = [-14.2, 0, -9] }) {
             </mesh>
           ))
         )}
-        {/* Puerta técnica de acceso con manija plateada */}
+        {/* Puerta técnica de acceso con manija y cartel de alta tensión */}
         <mesh position={[1.62, 1.15, -1.45]}>
           <boxGeometry args={[0.06, 2.1, 0.95]} />
           <meshStandardMaterial color="#272b30" metalness={0.6} roughness={0.4} />
@@ -273,6 +336,10 @@ export function ElectricalSubstation({ position = [-14.2, 0, -9] }) {
         <mesh position={[1.66, 1.12, -1.12]}>
           <boxGeometry args={[0.04, 0.18, 0.05]} />
           <meshStandardMaterial color="#cbd5e1" metalness={0.85} />
+        </mesh>
+        <mesh position={[1.66, 1.65, -1.45]}>
+          <boxGeometry args={[0.02, 0.22, 0.32]} />
+          <meshStandardMaterial color="#facc15" roughness={0.4} />
         </mesh>
         {/* Techo metálico voladizo + tira LED cálida */}
         <mesh position={[0, 3.04, 0]} castShadow>
@@ -285,9 +352,8 @@ export function ElectricalSubstation({ position = [-14.2, 0, -9] }) {
         </mesh>
       </group>
 
-      {/* Patio cercado del transformador (z = +2.35) */}
+      {/* Patio cercado del transformador */}
       <group position={[0, 0.28, 2.35]}>
-        {/* Transformador principal gris con aletas */}
         <mesh position={[0, 1.05, 0]} castShadow receiveShadow>
           <boxGeometry args={[1.65, 2.1, 1.5]} />
           <meshStandardMaterial color="#475569" metalness={0.55} roughness={0.42} />
@@ -298,7 +364,6 @@ export function ElectricalSubstation({ position = [-14.2, 0, -9] }) {
             <meshStandardMaterial color="#334155" metalness={0.6} />
           </mesh>
         ))}
-        {/* 3 Aisladores cerámicos superiores + caños de conexión al edificio */}
         {[-0.42, 0, 0.42].map((ix) => (
           <group key={`ins-${ix}`} position={[ix, 2.32, 0]}>
             <mesh castShadow>
@@ -311,7 +376,6 @@ export function ElectricalSubstation({ position = [-14.2, 0, -9] }) {
             </mesh>
           </group>
         ))}
-        {/* Cerco perimetral metálico oscuro */}
         {[-1.65, 1.65].map((fx) => (
           <mesh key={`fc-${fx}`} position={[fx, 1.1, 0]}>
             <boxGeometry args={[0.06, 2.2, 2.2]} />
@@ -331,15 +395,12 @@ export function ElectricalSubstation({ position = [-14.2, 0, -9] }) {
 
 /**
  * 02_arbustos_y_canteros.jpg
- * Cantero modular con estructura de hierro, borde de hormigón, listones horizontales de madera
- * y tres especies de arbustos (boj redondeado, arbusto frondoso y gramínea ornamental).
  */
 function ModularPlanterBox({ position = [0, 0, 0], variant = 0 }) {
   const oakTex = useMemo(() => getWoodTexture('oak'), []);
 
   return (
     <group position={position}>
-      {/* Marco metálico oscuro + listones horizontales de madera */}
       <mesh position={[0, 0.28, 0]} castShadow receiveShadow>
         <boxGeometry args={[0.68, 0.52, 1.38]} />
         <meshStandardMaterial color="#1b1f24" metalness={0.6} roughness={0.4} />
@@ -348,15 +409,12 @@ function ModularPlanterBox({ position = [0, 0, 0], variant = 0 }) {
         <boxGeometry args={[0.7, 0.42, 1.28]} />
         <meshStandardMaterial map={oakTex} roughness={0.65} />
       </mesh>
-      {/* Borde superior de hormigón claro */}
       <mesh position={[0, 0.56, 0]} castShadow>
         <boxGeometry args={[0.74, 0.08, 1.44]} />
         <meshStandardMaterial color="#cbd5e1" roughness={0.8} />
       </mesh>
 
-      {/* Vegetación según variante */}
       {variant % 3 === 0 ? (
-        /* Rounded Evergreen */
         <group position={[0, 0.92, 0]}>
           <mesh castShadow>
             <sphereGeometry args={[0.42, 12, 12]} />
@@ -368,7 +426,6 @@ function ModularPlanterBox({ position = [0, 0, 0], variant = 0 }) {
           </mesh>
         </group>
       ) : variant % 3 === 1 ? (
-        /* Layered Leafy Shrub */
         <group position={[0, 0.96, 0]}>
           {[
             [0, 0, 0, 0.34, '#3f7d47'],
@@ -382,7 +439,6 @@ function ModularPlanterBox({ position = [0, 0, 0], variant = 0 }) {
           ))}
         </group>
       ) : (
-        /* Ornamental Tuft */
         <group position={[0, 0.85, 0]}>
           {[-0.25, -0.08, 0.08, 0.25].map((rot, i) => (
             <mesh key={i} position={[0, 0, (i - 1.5) * 0.14]} rotation={[rot, 0, rot * 0.6]} castShadow>
@@ -398,22 +454,19 @@ function ModularPlanterBox({ position = [0, 0, 0], variant = 0 }) {
 
 /**
  * 03_parada_de_colectivo.jpg
- * Parada de colectivo con plataforma de hormigón, columnas negras, vidrios, banco de madera,
- * tótem digital y techo con cielorraso de madera e iluminación LED.
  */
 function BusStopShelter({ position = [0, 0, 0] }) {
   const oakTex = useMemo(() => getWoodTexture('oak'), []);
   const concreteTex = useMemo(() => getConcreteSlabTexture(), []);
+  const screenTex = useMemo(() => getDepartureScreenTexture(), []);
 
   return (
     <group position={position}>
-      {/* Plataforma de hormigón */}
       <mesh position={[0, 0.07, 0]} receiveShadow castShadow>
         <boxGeometry args={[2.3, 0.14, 4.8]} />
         <meshStandardMaterial map={concreteTex} color="#cbd5e1" roughness={0.82} />
       </mesh>
 
-      {/* 4 Columnas metálicas oscuras */}
       {[-2.1, 2.1].map((pz) =>
         [-0.75, 0.75].map((px) => (
           <mesh key={`bc-${px}-${pz}`} position={[px, 1.38, pz]} castShadow>
@@ -423,7 +476,6 @@ function BusStopShelter({ position = [0, 0, 0] }) {
         ))
       )}
 
-      {/* Paños vidriados trasero y laterales */}
       <mesh position={[-0.75, 1.35, 0]}>
         <boxGeometry args={[0.04, 2.15, 4.1]} />
         <meshStandardMaterial color="#bae6fd" transparent opacity={0.32} roughness={0.1} />
@@ -435,7 +487,6 @@ function BusStopShelter({ position = [0, 0, 0] }) {
         </mesh>
       ))}
 
-      {/* Banco de listones de madera interior */}
       <group position={[-0.3, 0.14, -0.55]}>
         <mesh position={[0, 0.42, 0]} castShadow>
           <boxGeometry args={[0.52, 0.08, 1.9]} />
@@ -453,7 +504,7 @@ function BusStopShelter({ position = [0, 0, 0] }) {
         ))}
       </group>
 
-      {/* Tótem digital negro junto al banco */}
+      {/* Tótem digital con pantalla realista de horarios */}
       <group position={[-0.32, 0.14, 1.3]}>
         <mesh position={[0, 0.92, 0]} castShadow>
           <boxGeometry args={[0.24, 1.84, 0.56]} />
@@ -461,11 +512,15 @@ function BusStopShelter({ position = [0, 0, 0] }) {
         </mesh>
         <mesh position={[0.125, 1.15, 0]} rotation={[0, Math.PI / 2, 0]}>
           <planeGeometry args={[0.42, 0.75]} />
-          <meshStandardMaterial color="#0f172a" emissive="#38bdf8" emissiveIntensity={0.45} />
+          <meshStandardMaterial
+            map={screenTex}
+            emissive="#f8fafc"
+            emissiveMap={screenTex}
+            emissiveIntensity={0.45}
+          />
         </mesh>
       </group>
 
-      {/* Techo oscuro con cielorraso de madera cálida y tira LED */}
       <mesh position={[0.1, 2.7, 0]} rotation={[0, 0, -0.06]} castShadow>
         <boxGeometry args={[2.15, 0.18, 5.1]} />
         <meshStandardMaterial color="#1b1f24" metalness={0.65} roughness={0.38} />
@@ -485,7 +540,6 @@ function BusStopShelter({ position = [0, 0, 0] }) {
 
 /**
  * 04_bicicletero_con_bicicletas.jpg
- * Bicicletero con base de hormigón, laterales de listones de madera, 5 arcos metálicos y 2 bicicletas 3D.
  */
 function BicycleRackWithBikes({ position = [0, 0, 0] }) {
   const oakTex = useMemo(() => getWoodTexture('oak'), []);
@@ -493,13 +547,11 @@ function BicycleRackWithBikes({ position = [0, 0, 0] }) {
 
   return (
     <group position={position}>
-      {/* Base de hormigón */}
       <mesh position={[0, 0.08, 0]} receiveShadow castShadow>
         <boxGeometry args={[1.55, 0.16, 4.2]} />
         <meshStandardMaterial map={concreteTex} color="#cbd5e1" roughness={0.82} />
       </mesh>
 
-      {/* Laterales bajos de listones de madera */}
       {[-1.95, 1.95].map((ez) => (
         <mesh key={`bw-${ez}`} position={[0, 0.34, ez]} castShadow>
           <boxGeometry args={[1.45, 0.36, 0.14]} />
@@ -507,7 +559,6 @@ function BicycleRackWithBikes({ position = [0, 0, 0] }) {
         </mesh>
       ))}
 
-      {/* 5 Arcos metálicos invertidos */}
       {[-1.4, -0.7, 0, 0.7, 1.4].map((hz, i) => (
         <mesh key={`hoop-${i}`} position={[0, 0.16, hz]} castShadow>
           <torusGeometry args={[0.34, 0.035, 10, 18, Math.PI]} />
@@ -515,20 +566,17 @@ function BicycleRackWithBikes({ position = [0, 0, 0] }) {
         </mesh>
       ))}
 
-      {/* 2 Bicicletas estacionadas (negra y verde salvia) */}
       {[
         { z: -0.62, color: '#1e2228' },
         { z: 0.78, color: '#4d7c5b' },
       ].map((bike, idx) => (
         <group key={`bike-${idx}`} position={[0, 0.16, bike.z]}>
-          {/* Ruedas delantera y trasera */}
           {[-0.48, 0.48].map((wx) => (
             <mesh key={wx} position={[wx, 0.32, 0]} castShadow>
               <torusGeometry args={[0.28, 0.03, 10, 20]} />
               <meshStandardMaterial color="#111827" roughness={0.6} />
             </mesh>
           ))}
-          {/* Cuadro */}
           <mesh position={[0, 0.56, 0]}>
             <boxGeometry args={[0.62, 0.045, 0.045]} />
             <meshStandardMaterial color={bike.color} metalness={0.4} roughness={0.4} />
@@ -541,7 +589,6 @@ function BicycleRackWithBikes({ position = [0, 0, 0] }) {
             <boxGeometry args={[0.045, 0.56, 0.045]} />
             <meshStandardMaterial color={bike.color} metalness={0.4} roughness={0.4} />
           </mesh>
-          {/* Asiento y manubrio */}
           <mesh position={[-0.26, 0.72, 0]}>
             <boxGeometry args={[0.18, 0.05, 0.1]} />
             <meshStandardMaterial color="#b47b48" roughness={0.7} />
@@ -557,29 +604,41 @@ function BicycleRackWithBikes({ position = [0, 0, 0] }) {
 }
 
 /**
- * Zona exterior trasera de la estación: plaza pavimentada, parada de colectivos,
- * bicicletero con bicicletas y canteros modulares con arbustos.
+ * Zona exterior trasera conectada al andén principal y molinetes (sin muro de fondo).
  */
 export function ExteriorBusAndBikePlaza() {
   const concreteTex = useMemo(() => getConcreteSlabTexture(), []);
 
   return (
     <group position={[15.0, 0, 0]}>
+      {/* Escalones de salida desde el nivel del andén (0.9) hacia la plaza exterior (0.11) */}
+      {[0, 1, 2, 3].map((step) => (
+        <mesh
+          key={`exit-step-${step}`}
+          position={[-3.3 + step * 0.42, 0.72 - step * 0.18, 0]}
+          receiveShadow
+          castShadow
+        >
+          <boxGeometry args={[0.46, 0.2, 22]} />
+          <meshStandardMaterial map={concreteTex} color="#cbd5e1" roughness={0.82} />
+        </mesh>
+      ))}
+
       {/* Plaza exterior pavimentada */}
-      <mesh position={[0, 0.05, 0]} receiveShadow>
-        <boxGeometry args={[7.2, 0.12, 28]} />
+      <mesh position={[0.6, 0.05, 0]} receiveShadow>
+        <boxGeometry args={[8.4, 0.12, 28]} />
         <meshStandardMaterial map={concreteTex} color="#cbd5e1" roughness={0.85} />
       </mesh>
 
-      {/* Parada de Colectivos (03_parada_de_colectivo.jpg) */}
-      <BusStopShelter position={[1.2, 0.11, 6.5]} />
+      {/* Parada de Colectivos */}
+      <BusStopShelter position={[1.4, 0.11, 6.5]} />
 
-      {/* Bicicletero con Bicicletas (04_bicicletero_con_bicicletas.jpg) */}
-      <BicycleRackWithBikes position={[1.1, 0.11, -6.5]} />
+      {/* Bicicletero con Bicicletas */}
+      <BicycleRackWithBikes position={[1.3, 0.11, -6.5]} />
 
-      {/* Canteros modulares con arbustos (02_arbustos_y_canteros.jpg) */}
+      {/* Canteros modulares con arbustos */}
       {[-11.8, -10.3, -1.6, 1.6, 10.3, 11.8].map((pz, i) => (
-        <ModularPlanterBox key={`planter-${i}`} position={[2.3, 0.11, pz]} variant={i} />
+        <ModularPlanterBox key={`planter-${i}`} position={[2.6, 0.11, pz]} variant={i} />
       ))}
     </group>
   );

@@ -91,19 +91,9 @@ function BrickArchBay({ zCenter, brickTex }) {
 
   return (
     <group position={[9.4, 0.9, zCenter]}>
-      {/* Pared trasera del nicho abovedado */}
-      <mesh position={[1.9, 2.3, 0]} receiveShadow>
-        <boxGeometry args={[0.35, 4.6, 5.2]} />
-        <meshStandardMaterial map={brickTex} color="#a08876" roughness={0.88} />
-      </mesh>
-      {/* Fondo interior iluminado del nicho */}
-      <mesh position={[1.72, 2.3, 0]}>
-        <boxGeometry args={[0.04, 4.4, 4.8]} />
-        <meshStandardMaterial color="#4a3f38" roughness={0.9} />
-      </mesh>
-      {/* Iluminación cálida interior del arco para evitar que el fondo se vea oscuro */}
-      <pointLight position={[0.9, 3.6, 0]} intensity={2.8} distance={9} color="#fde68a" />
-      {/* Techo del nicho */}
+      {/* Paso abierto hacia el exterior (sin muro trasero en andén y zona de molinetes) */}
+      <pointLight position={[0.9, 3.6, 0]} intensity={2.6} distance={9} color="#fde68a" />
+      {/* Dintel superior del arco */}
       <mesh position={[0.95, 4.55, 0]}>
         <boxGeometry args={[1.9, 0.2, 5.2]} />
         <meshStandardMaterial color="#4b4139" roughness={0.88} />
@@ -315,6 +305,11 @@ export default function StationBuildingAndCanopy() {
       <mesh position={[5.6, 0.83, 0]} receiveShadow castShadow>
         <boxGeometry args={[7.4, 0.14, 32]} />
         <meshStandardMaterial map={concreteTex} color="#d4d7db" roughness={0.78} />
+      </mesh>
+      {/* Piso de conexión bajo los arcos y molinetes hacia el exterior */}
+      <mesh position={[10.35, 0.83, 0]} receiveShadow>
+        <boxGeometry args={[2.3, 0.14, 24]} />
+        <meshStandardMaterial map={concreteTex} color="#cbd5e1" roughness={0.8} />
       </mesh>
 
       {/* Franja podotáctil + línea amarilla de seguridad */}
