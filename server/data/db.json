@@ -1,9 +1,9 @@
 {
-  "coins": 13356,
-  "streak": 1,
+  "coins": 13397,
+  "streak": 0,
   "bestStreak": 3,
-  "totalAnswered": 32,
-  "totalCorrect": 13,
+  "totalAnswered": 34,
+  "totalCorrect": 14,
   "upgrades": [
     "benches",
     "bench_curved",
@@ -21,7 +21,9 @@
     "substation",
     "second_platform",
     "station2_canopy",
-    "station2_furniture"
+    "station2_furniture",
+    "station2_shops",
+    "station2_exterior"
   ],
   "unlockedTrains": [
     "sarmiento",

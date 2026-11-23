@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
+import * as THREE from 'three';
 import StationEnvironment from './StationEnvironment.jsx';
 import Train from './Train.jsx';
 import Passengers from './Passengers.jsx';
@@ -46,6 +47,10 @@ const CAMERA_TARGETS = {
 function CameraRig({ controlsRef }) {
   const cameraPreset = useGameStore((s) => s.cameraPreset);
   const { camera } = useThree();
+  const keysRef = useRef({});
+  const forwardVec = useRef(new THREE.Vector3());
+  const rightVec = useRef(new THREE.Vector3());
+  const moveVec = useRef(new THREE.Vector3());
 
   useEffect(() => {
     const cfg = CAMERA_TARGETS[cameraPreset] || CAMERA_TARGETS.overview;
@@ -55,6 +60,60 @@ function CameraRig({ controlsRef }) {
       controlsRef.current.update();
     }
   }, [cameraPreset, camera, controlsRef]);
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key.startsWith('Arrow')) {
+        e.preventDefault();
+        keysRef.current[e.key] = true;
+      }
+    };
+    const onKeyUp = (e) => {
+      if (e.key.startsWith('Arrow')) {
+        keysRef.current[e.key] = false;
+      }
+    };
+    const onBlur = () => {
+      keysRef.current = {};
+    };
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('blur', onBlur);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('blur', onBlur);
+    };
+  }, []);
+
+  useFrame((_, delta) => {
+    const keys = keysRef.current;
+    const controls = controlsRef.current;
+    if (!controls) return;
+
+    const fwd = (keys.ArrowUp ? 1 : 0) - (keys.ArrowDown ? 1 : 0);
+    const strafe = (keys.ArrowRight ? 1 : 0) - (keys.ArrowLeft ? 1 : 0);
+    if (fwd === 0 && strafe === 0) return;
+
+    camera.getWorldDirection(forwardVec.current);
+    forwardVec.current.y = 0;
+    if (forwardVec.current.lengthSq() < 1e-6) return;
+    forwardVec.current.normalize();
+
+    rightVec.current.crossVectors(forwardVec.current, camera.up).normalize();
+
+    const speed = 14 * Math.min(delta, 0.05);
+    moveVec.current
+      .set(0, 0, 0)
+      .addScaledVector(forwardVec.current, fwd * speed)
+      .addScaledVector(rightVec.current, strafe * speed);
+
+    camera.position.add(moveVec.current);
+    controls.target.add(moveVec.current);
+    controls.update();
+  });
 
   return null;
 }
@@ -103,11 +162,11 @@ export default function StationCanvas() {
       <OrbitControls
         ref={controlsRef}
         target={[3, 1.5, 0]}
-        enablePan={false}
-        minPolarAngle={0.22}
-        maxPolarAngle={Math.PI / 2 - 0.08}
-        minDistance={8}
-        maxDistance={36}
+        enablePan={true}
+        minPolarAngle={0.18}
+        maxPolarAngle={Math.PI / 2 - 0.06}
+        minDistance={4}
+        maxDistance={60}
       />
     </Canvas>
   );

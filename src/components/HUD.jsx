@@ -170,7 +170,7 @@ export default function HUD() {
           </button>
         </div>
 
-        <p className="controls-hint">Teclas 1-4 en trivia • Enter/Espacio para llamar tren</p>
+        <p className="controls-hint">Flechas: mover cámara • Arrastra: rotar • 1-4: trivia</p>
       </header>
 
       <div className="hud-actions">
