@@ -15,7 +15,9 @@ const app = express();
 const PORT = process.env.PORT || 3002;
 
 const QUESTIONS_PATH = path.resolve(__dirname, 'data/questions.json');
-const DB_PATH = path.resolve(__dirname, 'data/db.json');
+const DB_PATH = process.env.VERCEL
+  ? '/tmp/db.json'
+  : path.resolve(__dirname, 'data/db.json');
 
 const UPGRADE_CATALOG = [
   {
@@ -599,7 +601,7 @@ app.post('/api/station/reset', (_req, res) => {
   res.json(buildStationPayload(fresh));
 });
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
   const distPath = path.resolve(__dirname, '../dist');
   app.use(express.static(distPath));
   app.get('*', (_req, res) => {
@@ -607,6 +609,10 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`Servidor Node.js escuchando en http://localhost:${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Servidor Node.js escuchando en http://localhost:${PORT}`);
+  });
+}
+
+export default app;

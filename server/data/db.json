@@ -1,9 +1,9 @@
 {
-  "coins": 16804,
-  "streak": 2,
-  "bestStreak": 4,
-  "totalAnswered": 51,
-  "totalCorrect": 24,
+  "coins": 19188,
+  "streak": 1,
+  "bestStreak": 5,
+  "totalAnswered": 62,
+  "totalCorrect": 32,
   "upgrades": [
     "benches",
     "bench_curved",
@@ -37,7 +37,8 @@
     "upgrades_3",
     "trains_2",
     "upgrades_all",
-    "streak_3"
+    "streak_3",
+    "streak_5"
   ],
   "sandboxMode": true
 }
