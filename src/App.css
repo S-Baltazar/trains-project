@@ -612,3 +612,57 @@
   font-weight: 700;
   color: #94a3b8;
 }
+
+.btn-sandbox-active {
+  border-color: rgba(34, 197, 94, 0.55);
+  color: #86efac;
+}
+
+.sandbox-modal {
+  max-width: 420px;
+}
+
+.sandbox-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.sandbox-input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.95rem;
+  color: #f8fafc;
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 10px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.sandbox-input:focus {
+  border-color: #facc15;
+}
+
+.sandbox-error {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #fca5a5;
+  font-weight: 600;
+}
+
+.sandbox-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.btn-close-text {
+  padding: 0.5rem 0.9rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: transparent;
+  color: #cbd5e1;
+  cursor: pointer;
+}

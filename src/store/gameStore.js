@@ -47,6 +47,8 @@ export const useGameStore = create((set, get) => ({
   shopOpen: false,
   trainShopOpen: false,
   statsOpen: false,
+  sandboxModalOpen: false,
+  sandboxMode: false,
   timeOfDay: 'night',
   cameraPreset: 'overview',
   muted: false,
@@ -63,11 +65,13 @@ export const useGameStore = create((set, get) => ({
 
   clearToast: () => set({ toast: null }),
 
-  setShopOpen: (shopOpen) => set({ shopOpen, trainShopOpen: false, statsOpen: false }),
+  setShopOpen: (shopOpen) => set({ shopOpen, trainShopOpen: false, statsOpen: false, sandboxModalOpen: false }),
 
-  setTrainShopOpen: (trainShopOpen) => set({ trainShopOpen, shopOpen: false, statsOpen: false }),
+  setTrainShopOpen: (trainShopOpen) => set({ trainShopOpen, shopOpen: false, statsOpen: false, sandboxModalOpen: false }),
 
-  setStatsOpen: (statsOpen) => set({ statsOpen, shopOpen: false, trainShopOpen: false }),
+  setStatsOpen: (statsOpen) => set({ statsOpen, shopOpen: false, trainShopOpen: false, sandboxModalOpen: false }),
+
+  setSandboxModalOpen: (sandboxModalOpen) => set({ sandboxModalOpen, shopOpen: false, trainShopOpen: false, statsOpen: false }),
 
   setDifficulty: (difficulty) => set({ difficulty }),
 
@@ -99,6 +103,7 @@ export const useGameStore = create((set, get) => ({
         trainsCatalog: data.trainsCatalog || [],
         achievements: data.achievements || [],
         passiveIncomePerTrain: data.passiveIncomePerTrain || 0,
+        sandboxMode: Boolean(data.sandboxMode),
         serverOnline: true,
       });
     } catch {
@@ -312,13 +317,50 @@ export const useGameStore = create((set, get) => ({
         trainsCatalog: data.trainsCatalog || [],
         achievements: data.achievements || [],
         passiveIncomePerTrain: data.passiveIncomePerTrain || 0,
+        sandboxMode: Boolean(data.sandboxMode),
         shopOpen: false,
         trainShopOpen: false,
         statsOpen: false,
+        sandboxModalOpen: false,
       });
       get().showToast('Estación reiniciada desde cero', 'success');
     } catch {
       get().showToast('Error al reiniciar la estación', 'error');
+    }
+  },
+
+  activateSandbox: async (password) => {
+    try {
+      const res = await fetch('/api/station/sandbox', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        playErrorSound(get().muted);
+        get().showToast(data.error || 'Contraseña incorrecta', 'error');
+        return false;
+      }
+
+      set({
+        coins: data.coins,
+        upgrades: data.upgrades,
+        catalog: data.catalog,
+        unlockedTrains: data.unlockedTrains || ['sarmiento'],
+        selectedTrain: data.selectedTrain || 'sarmiento',
+        trainsCatalog: data.trainsCatalog || [],
+        achievements: data.achievements || [],
+        passiveIncomePerTrain: data.passiveIncomePerTrain || 0,
+        sandboxMode: true,
+        sandboxModalOpen: false,
+      });
+      playCoinSound(get().muted);
+      get().showToast('🔓 Modo Sandbox activado: ¡todas las mejoras y trenes desbloqueados!', 'success');
+      return true;
+    } catch {
+      get().showToast('Error de conexión al activar Modo Sandbox', 'error');
+      return false;
     }
   },
 }));

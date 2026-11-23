@@ -46,6 +46,9 @@ export default function HUD() {
   const setShopOpen = useGameStore((s) => s.setShopOpen);
   const setTrainShopOpen = useGameStore((s) => s.setTrainShopOpen);
   const setStatsOpen = useGameStore((s) => s.setStatsOpen);
+  const setSandboxModalOpen = useGameStore((s) => s.setSandboxModalOpen);
+  const sandboxMode = useGameStore((s) => s.sandboxMode);
+  const showToast = useGameStore((s) => s.showToast);
   const resetStation = useGameStore((s) => s.resetStation);
 
   const [secondsLeft, setSecondsLeft] = useState(30);
@@ -164,6 +167,17 @@ export default function HUD() {
         <button className="btn-shop" onClick={() => setShopOpen(true)}>
           🛠️ Mejorar Estación
           {affordableCount > 0 && <span className="badge">{affordableCount}</span>}
+        </button>
+        <button
+          className={`btn-shop ${sandboxMode ? 'btn-sandbox-active' : ''}`}
+          onClick={() =>
+            sandboxMode
+              ? showToast('El Modo Sandbox ya está activo', 'info')
+              : setSandboxModalOpen(true)
+          }
+          title="Modo Sandbox con contraseña"
+        >
+          {sandboxMode ? '🔓 Sandbox' : '🔒'}
         </button>
         <button className="btn-shop btn-reset" onClick={handleReset} title="Reiniciar estación desde 0">
           🔄 Reiniciar Estación

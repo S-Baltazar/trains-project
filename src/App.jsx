@@ -8,6 +8,7 @@ import './App.css';
 const UpgradeShop = lazy(() => import('./components/UpgradeShop.jsx'));
 const TrainShopModal = lazy(() => import('./components/TrainShopModal.jsx'));
 const StatsModal = lazy(() => import('./components/StatsModal.jsx'));
+const SandboxModal = lazy(() => import('./components/SandboxModal.jsx'));
 
 export default function App() {
   const fetchStation = useGameStore((s) => s.fetchStation);
@@ -36,6 +37,7 @@ export default function App() {
         <UpgradeShop />
         <TrainShopModal />
         <StatsModal />
+        <SandboxModal />
       </Suspense>
 
       {toast && (

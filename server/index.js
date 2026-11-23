@@ -224,6 +224,7 @@ const DEFAULT_STATE = {
   unlockedTrains: ['sarmiento'],
   selectedTrain: 'sarmiento',
   unlockedAchievements: [],
+  sandboxMode: false,
 };
 
 function loadQuestions() {
@@ -260,6 +261,7 @@ function buildStationPayload(state) {
     totalAnswered: state.totalAnswered,
     totalCorrect: state.totalCorrect,
     upgrades: state.upgrades,
+    sandboxMode: Boolean(state.sandboxMode),
     passiveIncomePerTrain: computePassiveIncome(state.upgrades),
     catalog: UPGRADE_CATALOG.map((item) => ({
       ...item,
@@ -474,6 +476,26 @@ app.post('/api/station/train', (req, res) => {
   res.json({
     purchased,
     selected: train,
+    newAchievements,
+    ...buildStationPayload(state),
+  });
+});
+
+app.post('/api/station/sandbox', (req, res) => {
+  const { password } = req.body ?? {};
+  if (password !== 'baltazar') {
+    return res.status(403).json({ error: 'Contraseña incorrecta' });
+  }
+
+  const state = loadState();
+  state.sandboxMode = true;
+  state.upgrades = UPGRADE_CATALOG.map((u) => u.id);
+  state.unlockedTrains = TRAIN_CATALOG.map((t) => t.id);
+  state.coins = Math.max(state.coins, 9999);
+  const newAchievements = evaluateAchievements(state);
+  saveState(state);
+
+  res.json({
     newAchievements,
     ...buildStationPayload(state),
   });
