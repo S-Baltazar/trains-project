@@ -1,5 +1,6 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 import { useGameStore } from '../../store/gameStore.js';
 import { TrainFormation } from '../Train.jsx';
 import {
@@ -292,7 +293,51 @@ export function SecondPlatformAndBridge() {
         ))}
 
         <pointLight position={[bridgeCenterX, deckY + 2.1, 0]} intensity={2.2} distance={14} color="#fde68a" />
+
+        {/* Pasajeros cruzando el puente peatonal */}
+        <BridgePedestrians deckY={deckY + 0.14} />
       </group>
+    </group>
+  );
+}
+
+/**
+ * Peatones caminando de ida y vuelta sobre el puente peatonal elevado.
+ */
+function BridgePedestrians({ deckY }) {
+  const pedRefs = useRef([]);
+  const colors = ['#38bdf8', '#f472b6', '#34d399', '#fbbf24'];
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    pedRefs.current.forEach((mesh, i) => {
+      if (!mesh) return;
+      const phase = t * (0.45 + i * 0.12) + i * 1.7;
+      mesh.position.x = -2.05 + Math.sin(phase) * 6.0;
+      mesh.position.y = deckY + Math.abs(Math.sin(t * 7 + i)) * 0.05;
+    });
+  });
+
+  return (
+    <group>
+      {colors.map((c, i) => (
+        <group
+          key={`bped-${i}`}
+          ref={(el) => {
+            pedRefs.current[i] = el;
+          }}
+          position={[-2.05, deckY, (i - 1.5) * 0.36]}
+        >
+          <mesh position={[0, 0.52, 0]} castShadow>
+            <capsuleGeometry args={[0.14, 0.42, 4, 8]} />
+            <meshStandardMaterial color={c} roughness={0.65} />
+          </mesh>
+          <mesh position={[0, 0.96, 0]} castShadow>
+            <sphereGeometry args={[0.13, 10, 10]} />
+            <meshStandardMaterial color="#fde68a" roughness={0.6} />
+          </mesh>
+        </group>
+      ))}
     </group>
   );
 }
@@ -401,7 +446,38 @@ export function ElectricalSubstation({ position = [-24.0, 0, -10] }) {
       </group>
 
       <pointLight position={[2.2, 2.8, 0]} intensity={1.8} distance={8} color="#fde68a" />
+
+      {/* Cableado aéreo de alta tensión desde la subestación hacia la red de catenaria */}
+      {[-0.42, 0, 0.42].map((ix, i) => (
+        <OverheadPowerWire
+          key={`pw-${i}`}
+          start={[ix, 2.65, 2.35]}
+          end={[21.55, 4.75, -8 + i * 0.25]}
+        />
+      ))}
     </group>
+  );
+}
+
+function OverheadPowerWire({ start, end }) {
+  const { mid, len, quat } = useMemo(() => {
+    const a = new THREE.Vector3(...start);
+    const b = new THREE.Vector3(...end);
+    const m = new THREE.Vector3().addVectors(a, b).multiplyScalar(0.5);
+    const dir = new THREE.Vector3().subVectors(b, a);
+    const l = dir.length();
+    const q = new THREE.Quaternion().setFromUnitVectors(
+      new THREE.Vector3(0, 1, 0),
+      dir.normalize()
+    );
+    return { mid: [m.x, m.y, m.z], len: l, quat: q };
+  }, [start, end]);
+
+  return (
+    <mesh position={mid} quaternion={quat}>
+      <cylinderGeometry args={[0.022, 0.022, len, 6]} />
+      <meshStandardMaterial color="#334155" metalness={0.8} roughness={0.3} />
+    </mesh>
   );
 }
 
@@ -652,6 +728,66 @@ export function ExteriorBusAndBikePlaza() {
       {[-11.8, -10.3, -1.6, 1.6, 10.3, 11.8].map((pz, i) => (
         <ModularPlanterBox key={`planter-${i}`} position={[2.6, 0.11, pz]} variant={i} />
       ))}
+
+      {/* Colectivo urbano animado llegando a la parada */}
+      <AnimatedCityBus />
+    </group>
+  );
+}
+
+/**
+ * Colectivo urbano 3D que circula y se detiene brevemente en la parada exterior.
+ */
+function AnimatedCityBus() {
+  const busRef = useRef(null);
+
+  useFrame(({ clock }) => {
+    if (!busRef.current) return;
+    // Ciclo de 18 segundos: avanza, frena en z = 6.5 (parada), y sigue
+    const cycle = clock.getElapsedTime() % 18;
+    let z;
+    if (cycle < 6) {
+      z = -24 + (cycle / 6) * 30.5;
+    } else if (cycle < 11) {
+      z = 6.5;
+    } else {
+      z = 6.5 + ((cycle - 11) / 7) * 28;
+    }
+    busRef.current.position.z = z;
+  });
+
+  return (
+    <group ref={busRef} position={[3.9, 0.12, -20]}>
+      {/* Carrocería */}
+      <mesh position={[0, 1.35, 0]} castShadow>
+        <boxGeometry args={[1.95, 2.1, 6.2]} />
+        <meshStandardMaterial color="#0284c7" roughness={0.35} />
+      </mesh>
+      <mesh position={[0, 2.2, 0]}>
+        <boxGeometry args={[1.97, 0.4, 6.22]} />
+        <meshStandardMaterial color="#f8fafc" roughness={0.4} />
+      </mesh>
+      {/* Ventanas */}
+      <mesh position={[0, 1.65, 0.1]}>
+        <boxGeometry args={[1.98, 0.72, 5.6]} />
+        <meshStandardMaterial color="#0f172a" roughness={0.12} metalness={0.5} />
+      </mesh>
+      {/* Faros */}
+      {[-0.65, 0.65].map((hx) => (
+        <mesh key={hx} position={[hx, 0.75, 3.12]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.1, 0.1, 0.04, 10]} />
+          <meshStandardMaterial color="#fef08a" emissive="#fde047" emissiveIntensity={2.0} />
+        </mesh>
+      ))}
+      {/* 4 Ruedas */}
+      {[-0.95, 0.95].map((wx) =>
+        [-1.9, 1.9].map((wz) => (
+          <mesh key={`bw-${wx}-${wz}`} position={[wx, 0.35, wz]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.35, 0.35, 0.24, 14]} />
+            <meshStandardMaterial color="#111827" roughness={0.7} />
+          </mesh>
+        ))
+      )}
     </group>
   );
 }

@@ -53,6 +53,15 @@ export default function Passengers() {
     if (upgrades.includes('cafe')) {
       list.push({ id: 'cafe', pos: new THREE.Vector3(5.3, 0.9, 2.2), occupied: false });
     }
+    if (upgrades.includes('turnstiles')) {
+      list.push({ id: 'turnstiles', pos: new THREE.Vector3(8.8, 0.9, 0), occupied: false });
+    }
+    if (upgrades.includes('bookstore')) {
+      list.push({ id: 'bookstore', pos: new THREE.Vector3(8.8, 0.9, -7.0), occupied: false });
+    }
+    if (upgrades.includes('flower_shop')) {
+      list.push({ id: 'flower', pos: new THREE.Vector3(8.8, 0.9, 7.0), occupied: false });
+    }
     return list;
   }, [upgrades]);
 

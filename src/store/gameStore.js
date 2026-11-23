@@ -55,6 +55,15 @@ export const useGameStore = create((set, get) => ({
   timeOfDay: 'night',
   cameraPreset: 'overview',
   muted: false,
+  stationName:
+    (typeof window !== 'undefined' && window.localStorage.getItem('stationName')) ||
+    'Estación Trivia 3D',
+  blitzActive: false,
+  blitzEndsAt: null,
+  blitzScore: 0,
+  bestBlitzScore: Number(
+    (typeof window !== 'undefined' && window.localStorage.getItem('bestBlitzScore')) || 0
+  ),
   toast: null,
 
   getWaitDurationMs: () => {
@@ -87,6 +96,42 @@ export const useGameStore = create((set, get) => ({
   setCameraPreset: (cameraPreset) => set({ cameraPreset }),
 
   toggleMuted: () => set((s) => ({ muted: !s.muted })),
+
+  setStationName: (name) => {
+    const clean = name.trim() || 'Estación Trivia 3D';
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('stationName', clean);
+    }
+    set({ stationName: clean });
+  },
+
+  startBlitz: async () => {
+    const { phase, lastQuestionId, difficulty, muted } = get();
+    if (phase === 'TRIVIA' || phase === 'RESULT') return;
+    playStationBell(muted);
+    set({
+      blitzActive: true,
+      blitzEndsAt: Date.now() + 60_000,
+      blitzScore: 0,
+      phase: 'TRIVIA',
+      waitEndsAt: null,
+      triviaEndsAt: Date.now() + 60_000,
+      selectedIndex: null,
+      lastResult: null,
+    });
+    try {
+      const params = new URLSearchParams();
+      if (lastQuestionId) params.set('lastId', lastQuestionId);
+      if (difficulty && difficulty !== 'Todas') params.set('difficulty', difficulty);
+      const res = await fetch(`/api/trivia/next?${params.toString()}`);
+      if (res.ok) {
+        const q = await res.json();
+        set({ activeQuestion: q, lastQuestionId: q.id });
+      }
+    } catch {
+      set({ blitzActive: false, blitzEndsAt: null, phase: 'WAITING', waitEndsAt: Date.now() + BASE_WAIT_MS });
+    }
+  },
 
   cycleWeather: () => {
     const order = ['clear', 'rain', 'rush'];
@@ -129,8 +174,27 @@ export const useGameStore = create((set, get) => ({
   },
 
   tickTimers: () => {
-    const { phase, waitEndsAt, triviaEndsAt, submitAnswer, isSubmitting } = get();
+    const { phase, waitEndsAt, triviaEndsAt, submitAnswer, isSubmitting, blitzActive, blitzEndsAt, blitzScore, bestBlitzScore } = get();
     const now = Date.now();
+
+    if (blitzActive && blitzEndsAt && now >= blitzEndsAt) {
+      const newBest = Math.max(bestBlitzScore, blitzScore);
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('bestBlitzScore', String(newBest));
+      }
+      set({
+        blitzActive: false,
+        blitzEndsAt: null,
+        bestBlitzScore: newBest,
+        phase: 'WAITING',
+        activeQuestion: null,
+        lastResult: null,
+        triviaEndsAt: null,
+        waitEndsAt: now + get().getWaitDurationMs(),
+      });
+      get().showToast(`⚡ ¡Contrarreloj finalizado! Aciertos: ${blitzScore} (Récord: ${newBest})`, 'success');
+      return;
+    }
 
     if (phase === 'WAITING' && waitEndsAt && now >= waitEndsAt) {
       set({ phase: 'ARRIVING', waitEndsAt: null });
@@ -237,11 +301,37 @@ export const useGameStore = create((set, get) => ({
         },
       });
 
-      setTimeout(() => {
+      if (data.correct && get().blitzActive) {
+        set((s) => ({ blitzScore: s.blitzScore + 1 }));
+      }
+
+      setTimeout(async () => {
+        if (get().blitzActive && get().blitzEndsAt && Date.now() < get().blitzEndsAt) {
+          try {
+            const params = new URLSearchParams();
+            if (get().lastQuestionId) params.set('lastId', get().lastQuestionId);
+            if (get().difficulty && get().difficulty !== 'Todas') params.set('difficulty', get().difficulty);
+            const r = await fetch(`/api/trivia/next?${params.toString()}`);
+            if (r.ok) {
+              const nextQ = await r.json();
+              set({
+                phase: 'TRIVIA',
+                activeQuestion: nextQ,
+                lastQuestionId: nextQ.id,
+                selectedIndex: null,
+                lastResult: null,
+                triviaEndsAt: get().blitzEndsAt,
+              });
+              return;
+            }
+          } catch {
+            // fallback to normal departure
+          }
+        }
         if (get().phase === 'RESULT') {
           set({ phase: 'DEPARTING', activeQuestion: null, lastResult: null });
         }
-      }, 2600);
+      }, get().blitzActive ? 750 : 2600);
     } catch {
       set({ isSubmitting: false, phase: 'DEPARTING', activeQuestion: null });
       get().showToast('Error al comunicarse con el servidor', 'error');

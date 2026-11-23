@@ -163,8 +163,8 @@ function PassengerCarBody({
           <boxGeometry args={[2.46, 0.5, 1.15]} />
           <meshStandardMaterial
             color="#334155"
-            emissive="#1e293b"
-            emissiveIntensity={0.25}
+            emissive="#fde68a"
+            emissiveIntensity={0.42}
             roughness={0.12}
             metalness={0.4}
           />

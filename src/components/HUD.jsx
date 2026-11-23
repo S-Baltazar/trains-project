@@ -48,6 +48,10 @@ export default function HUD() {
   const setCameraPreset = useGameStore((s) => s.setCameraPreset);
   const muted = useGameStore((s) => s.muted);
   const toggleMuted = useGameStore((s) => s.toggleMuted);
+  const stationName = useGameStore((s) => s.stationName);
+  const setStationName = useGameStore((s) => s.setStationName);
+  const blitzActive = useGameStore((s) => s.blitzActive);
+  const startBlitz = useGameStore((s) => s.startBlitz);
   const catalog = useGameStore((s) => s.catalog);
   const trainsCatalog = useGameStore((s) => s.trainsCatalog);
   const achievements = useGameStore((s) => s.achievements);
@@ -104,7 +108,16 @@ export default function HUD() {
       <header className="hud">
         <div className="hud-title-row">
           <div>
-            <h1>Estación Trivia 3D</h1>
+            <h1
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                const next = window.prompt('Nombre de tu estación:', stationName);
+                if (next !== null) setStationName(next);
+              }}
+              title="Haz clic para personalizar el nombre de la estación"
+            >
+              {stationName} ✏️
+            </h1>
             <span className="station-level-tag">
               Nv. {stationLevel.level} • {stationLevel.title} • 😊 {satisfaction.percent}% (x{satisfaction.multiplier})
             </span>
@@ -138,12 +151,17 @@ export default function HUD() {
         </div>
 
         <div className="phase-box">
-          <span className="phase-label">{PHASE_LABELS[phase]}</span>
+          <span className="phase-label">
+            {blitzActive ? '⚡ Modo Contrarreloj (60s)' : PHASE_LABELS[phase]}
+          </span>
           {phase === 'WAITING' && (
             <div className="countdown-row">
               <span className="countdown-time">⏱️ {secondsLeft}s</span>
               <button className="btn-secondary" onClick={summonTrainNow}>
-                🚄 Llamar tren ahora
+                🚄 Llamar tren
+              </button>
+              <button className="btn-secondary" onClick={startBlitz} title="Responder preguntas en ráfaga durante 60s">
+                ⚡ 60s
               </button>
             </div>
           )}

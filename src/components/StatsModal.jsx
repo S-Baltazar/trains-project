@@ -11,6 +11,7 @@ export default function StatsModal() {
   const unlockedTrains = useGameStore((s) => s.unlockedTrains);
   const trainsCatalog = useGameStore((s) => s.trainsCatalog);
   const passiveIncomePerTrain = useGameStore((s) => s.passiveIncomePerTrain);
+  const bestBlitzScore = useGameStore((s) => s.bestBlitzScore);
   const achievements = useGameStore((s) => s.achievements);
 
   if (!statsOpen) return null;
@@ -39,7 +40,7 @@ export default function StatsModal() {
           </div>
           <div className="summary-box">
             <strong>🔥 {bestStreak}</strong>
-            <span>Mejor Racha</span>
+            <span>Mejor Racha • ⚡ Récord 60s: {bestBlitzScore}</span>
           </div>
           <div className="summary-box">
             <strong>+{passiveIncomePerTrain} 🪙</strong>
