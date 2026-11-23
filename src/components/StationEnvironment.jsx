@@ -4,12 +4,15 @@ import { useGameStore } from '../store/gameStore.js';
 import StationBuildingAndCanopy from './station/StationBuildingAndCanopy.jsx';
 import {
   AtmKioskModule,
+  BookstoreNewsstand,
   ClassicLampPost,
   CurvedErgonomicBench,
   DepartureTotem,
   DoubleSidedBench,
+  FlowerShopPavilion,
   IslandCoffeeBar,
   SlattedLinearBench,
+  TurnstileGateSet,
 } from './station/StationFurniture.jsx';
 import { getBrickTexture, getClockFaceTexture } from './station/textures.js';
 
@@ -38,6 +41,9 @@ export default function StationEnvironment() {
   const hasTotem = upgrades.includes('totem_screens');
   const hasCafe = upgrades.includes('cafe');
   const hasClockTower = upgrades.includes('clock_tower');
+  const hasTurnstiles = upgrades.includes('turnstiles');
+  const hasBookstore = upgrades.includes('bookstore');
+  const hasFlowerShop = upgrades.includes('flower_shop');
 
   return (
     <group>
@@ -87,6 +93,21 @@ export default function StationEnvironment() {
 
       {/* MEJORA 7: Barra de Café Isla (08_barra_cafe_isla_3d.jpg) */}
       {hasCafe && <IslandCoffeeBar position={[6.8, 0.9, 2.2]} />}
+
+      {/* MEJORA 8: Molinetes, Cestos y Mapa (04_molinetes_cestos_mapa_3d.jpg) */}
+      {hasTurnstiles && (
+        <TurnstileGateSet position={[13.6, 0.9, 0.0]} rotation={[0, Math.PI / 2, 0]} />
+      )}
+
+      {/* MEJORA 9: Librería y Revistero (03_libreria_revistero_3d.jpg) */}
+      {hasBookstore && (
+        <BookstoreNewsstand position={[14.4, 0.9, -6.5]} rotation={[0, Math.PI / 2, 0]} />
+      )}
+
+      {/* MEJORA 10: Florería Verde Metálica (02_floreria_verde_metalica_3d.jpg) */}
+      {hasFlowerShop && (
+        <FlowerShopPavilion position={[14.4, 0.9, 6.5]} rotation={[0, Math.PI / 2, 0]} />
+      )}
 
       {/* MEJORA 8: Torre del Reloj sobre el edificio histórico */}
       {hasClockTower && (

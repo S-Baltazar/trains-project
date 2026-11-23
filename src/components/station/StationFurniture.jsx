@@ -3,10 +3,12 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import {
   getAtmScreenTexture,
+  getBookstoreSignTexture,
   getClockFaceTexture,
   getDepartureScreenTexture,
   getMenuBoardTexture,
   getTicketKioskScreenTexture,
+  getTransitMapTexture,
   getVentGrilleTexture,
   getWoodTexture,
 } from './textures.js';
@@ -1015,6 +1017,411 @@ export function SuspendedLinearLamp({
       {castLight && (
         <pointLight position={[0, -0.15, 0]} intensity={2.4} distance={9.5} color="#fde68a" />
       )}
+    </group>
+  );
+}
+
+/**
+ * 02_floreria_verde_metalica_3d.jpg
+ * Florería invernadero metálica verde con techo vidriado a dos aguas, mostrador iluminado y flores.
+ */
+export function FlowerShopPavilion({ position = [0, 0, 0], rotation = [0, 0, 0] }) {
+  const frameColor = '#466452';
+  const counterColor = '#557763';
+  const flowerColors = ['#f472b6', '#ef4444', '#facc15', '#f8fafc', '#c084fc'];
+  const roofSlopeAngle = Math.atan2(0.55, 1.15);
+  const roofSlopeLen = Math.hypot(1.15, 0.55);
+
+  return (
+    <group position={position} rotation={rotation}>
+      {/* Estructura metálica verde: 6 columnas */}
+      {[-2.0, 0, 2.0].map((px) =>
+        [-1.1, 1.1].map((pz) => (
+          <mesh key={`fcol-${px}-${pz}`} position={[px, 1.15, pz]} castShadow>
+            <boxGeometry args={[0.08, 2.3, 0.08]} />
+            <meshStandardMaterial color={frameColor} metalness={0.5} roughness={0.42} />
+          </mesh>
+        ))
+      )}
+      {/* Vigas perimetrales superiores */}
+      {[-1.1, 1.1].map((pz) => (
+        <mesh key={`fbeam-${pz}`} position={[0, 2.28, pz]} castShadow>
+          <boxGeometry args={[4.1, 0.08, 0.08]} />
+          <meshStandardMaterial color={frameColor} metalness={0.5} roughness={0.42} />
+        </mesh>
+      ))}
+      {[-2.0, 2.0].map((px) => (
+        <mesh key={`fsbeam-${px}`} position={[px, 2.28, 0]} castShadow>
+          <boxGeometry args={[0.08, 0.08, 2.28]} />
+          <meshStandardMaterial color={frameColor} metalness={0.5} roughness={0.42} />
+        </mesh>
+      ))}
+      {/* Cumbrera del techo */}
+      <mesh position={[0, 2.83, 0]} castShadow>
+        <boxGeometry args={[4.1, 0.08, 0.08]} />
+        <meshStandardMaterial color={frameColor} metalness={0.5} roughness={0.42} />
+      </mesh>
+      {/* Cabrios del techo vidriado */}
+      {[-2.0, -1.0, 0, 1.0, 2.0].map((rx) => (
+        <group key={`frafter-${rx}`} position={[rx, 0, 0]}>
+          <mesh position={[0, 2.55, -0.57]} rotation={[roofSlopeAngle, 0, 0]}>
+            <boxGeometry args={[0.05, 0.06, roofSlopeLen]} />
+            <meshStandardMaterial color={frameColor} metalness={0.5} roughness={0.42} />
+          </mesh>
+          <mesh position={[0, 2.55, 0.57]} rotation={[-roofSlopeAngle, 0, 0]}>
+            <boxGeometry args={[0.05, 0.06, roofSlopeLen]} />
+            <meshStandardMaterial color={frameColor} metalness={0.5} roughness={0.42} />
+          </mesh>
+        </group>
+      ))}
+      {/* Paneles de vidrio del techo */}
+      <mesh position={[0, 2.57, -0.57]} rotation={[roofSlopeAngle, 0, 0]}>
+        <boxGeometry args={[4.04, 0.025, roofSlopeLen]} />
+        <meshStandardMaterial color="#d1fae5" transparent opacity={0.35} roughness={0.12} />
+      </mesh>
+      <mesh position={[0, 2.57, 0.57]} rotation={[-roofSlopeAngle, 0, 0]}>
+        <boxGeometry args={[4.04, 0.025, roofSlopeLen]} />
+        <meshStandardMaterial color="#d1fae5" transparent opacity={0.35} roughness={0.12} />
+      </mesh>
+      {/* Tira LED cálida bajo el techo */}
+      <mesh position={[0, 2.22, 0.96]}>
+        <boxGeometry args={[3.9, 0.03, 0.04]} />
+        <meshStandardMaterial color="#fef9c3" emissive="#fde68a" emissiveIntensity={1.8} />
+      </mesh>
+
+      {/* Mostrador verde frontal derecho con vitrina iluminada */}
+      <mesh position={[0.75, 0.48, 0.72]} castShadow receiveShadow>
+        <boxGeometry args={[2.05, 0.96, 0.68]} />
+        <meshStandardMaterial color={counterColor} roughness={0.55} />
+      </mesh>
+      {/* Nicho iluminado en el frente del mostrador */}
+      <mesh position={[1.18, 0.52, 1.065]}>
+        <boxGeometry args={[0.98, 0.62, 0.03]} />
+        <meshStandardMaterial color="#fef3c7" emissive="#fde68a" emissiveIntensity={0.85} />
+      </mesh>
+      {[-0.28, 0, 0.28].map((mx) =>
+        [0.36, 0.66].map((my) => (
+          <group key={`mpot-${mx}-${my}`} position={[1.18 + mx, my, 1.09]}>
+            <mesh>
+              <cylinderGeometry args={[0.055, 0.04, 0.09, 8]} />
+              <meshStandardMaterial color="#d6d3d1" roughness={0.8} />
+            </mesh>
+            <mesh position={[0, 0.07, 0]}>
+              <sphereGeometry args={[0.065, 8, 8]} />
+              <meshStandardMaterial color="#2f6b3c" roughness={0.85} />
+            </mesh>
+          </group>
+        ))
+      )}
+
+      {/* Rollos de papel de regalo sobre el mostrador trasero */}
+      <mesh position={[0.25, 0.46, -0.78]} castShadow>
+        <boxGeometry args={[1.4, 0.92, 0.45]} />
+        <meshStandardMaterial color={frameColor} roughness={0.6} />
+      </mesh>
+      {['#f472b6', '#a7f3d0', '#fde68a', '#cbd5e1'].map((rc, i) => (
+        <mesh key={`roll-${i}`} position={[0.25, 1.05 + i * 0.08, -0.82]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.032, 0.032, 0.72, 8]} />
+          <meshStandardMaterial color={rc} roughness={0.5} />
+        </mesh>
+      ))}
+
+      {/* Estanterías escalonadas con flores y follaje (izquierda, fondo y derecha) */}
+      {[
+        { pos: [-1.45, 0.35, 0.3], size: [0.85, 0.7, 1.5] },
+        { pos: [-1.15, 0.55, -0.65], size: [1.5, 1.1, 0.65] },
+        { pos: [1.55, 0.38, -0.35], size: [0.7, 0.76, 1.1] },
+      ].map((stand, idx) => (
+        <group key={`stand-${idx}`} position={stand.pos}>
+          <mesh castShadow receiveShadow>
+            <boxGeometry args={stand.size} />
+            <meshStandardMaterial color={frameColor} roughness={0.7} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Arreglos florales y macetas */}
+      {[
+        [-1.65, 0.82, 0.75],
+        [-1.35, 0.85, 0.35],
+        [-1.6, 0.85, -0.15],
+        [-1.4, 1.2, -0.6],
+        [-0.9, 1.22, -0.7],
+        [-0.45, 1.15, -0.7],
+        [1.55, 0.88, -0.6],
+        [1.55, 0.86, 0.0],
+        [1.15, 1.08, 0.72],
+        [0.45, 1.08, 0.72],
+      ].map(([fx, fy, fz], idx) => (
+        <group key={`flw-${idx}`} position={[fx, fy, fz]}>
+          <mesh position={[0, -0.06, 0]}>
+            <cylinderGeometry args={[0.11, 0.08, 0.14, 8]} />
+            <meshStandardMaterial color="#94a3b8" roughness={0.7} />
+          </mesh>
+          <mesh position={[0, 0.06, 0]}>
+            <dodecahedronGeometry args={[0.17, 0]} />
+            <meshStandardMaterial color={idx % 2 === 0 ? '#2f6b3c' : '#3f854d'} roughness={0.85} />
+          </mesh>
+          <mesh position={[0.04, 0.16, 0.03]}>
+            <sphereGeometry args={[0.065, 8, 8]} />
+            <meshStandardMaterial color={flowerColors[idx % flowerColors.length]} roughness={0.6} />
+          </mesh>
+          <mesh position={[-0.05, 0.14, -0.03]}>
+            <sphereGeometry args={[0.055, 8, 8]} />
+            <meshStandardMaterial color={flowerColors[(idx + 2) % flowerColors.length]} roughness={0.6} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Plantas colgantes desde el techo */}
+      {[-1.55, -0.85, 0.65, 1.35].map((hx, i) => (
+        <group key={`hang-${i}`} position={[hx, 1.85, i % 2 === 0 ? 0.55 : -0.45]}>
+          <mesh position={[0, 0.22, 0]}>
+            <cylinderGeometry args={[0.008, 0.008, 0.44, 6]} />
+            <meshStandardMaterial color="#334155" />
+          </mesh>
+          <mesh>
+            <cylinderGeometry args={[0.1, 0.07, 0.12, 8]} />
+            <meshStandardMaterial color="#64748b" />
+          </mesh>
+          <mesh position={[0, -0.04, 0]}>
+            <sphereGeometry args={[0.14, 8, 8]} />
+            <meshStandardMaterial color="#3f854d" roughness={0.85} />
+          </mesh>
+        </group>
+      ))}
+
+      <pointLight position={[0, 2.05, 0.2]} intensity={2.2} distance={8} color="#fde68a" />
+    </group>
+  );
+}
+
+/**
+ * 03_libreria_revistero_3d.jpg
+ * Librería y revistero con listones de madera, exhibidor escalonado, vitrina y cartel "BOOKS & NEWS".
+ */
+export function BookstoreNewsstand({ position = [0, 0, 0], rotation = [0, 0, 0] }) {
+  const oakTex = useMemo(() => getWoodTexture('oak'), []);
+  const signTex = useMemo(() => getBookstoreSignTexture(), []);
+  const bookColors = ['#ef4444', '#3b82f6', '#eab308', '#10b981', '#f97316', '#8b5cf6', '#ec4899'];
+
+  const frontSlats = useMemo(() => {
+    const arr = [];
+    for (let x = -1.86; x <= 1.86; x += 0.095) arr.push(x);
+    return arr;
+  }, []);
+
+  return (
+    <group position={position} rotation={rotation}>
+      {/* Zócalo oscuro */}
+      <mesh position={[0, 0.05, 0]} castShadow receiveShadow>
+        <boxGeometry args={[3.9, 0.1, 1.85]} />
+        <meshStandardMaterial color="#181b20" roughness={0.5} />
+      </mesh>
+
+      {/* Mostrador base con listones verticales de madera */}
+      <mesh position={[0, 0.54, 0]} castShadow receiveShadow>
+        <boxGeometry args={[3.86, 0.88, 1.78]} />
+        <meshStandardMaterial color="#2a241e" roughness={0.8} />
+      </mesh>
+      {frontSlats.map((sx, i) => (
+        <mesh key={`bslat-${i}`} position={[sx, 0.54, 0.905]} castShadow>
+          <boxGeometry args={[0.048, 0.86, 0.025]} />
+          <meshStandardMaterial map={oakTex} roughness={0.62} />
+        </mesh>
+      ))}
+
+      {/* Mesada superior oscura */}
+      <mesh position={[0, 1.0, 0]} castShadow>
+        <boxGeometry args={[3.96, 0.06, 1.88]} />
+        <meshStandardMaterial color="#22262c" metalness={0.35} roughness={0.45} />
+      </mesh>
+
+      {/* Estructura metálica superior */}
+      {[-1.9, 1.9].map((px) =>
+        [-0.88, 0.88].map((pz) => (
+          <mesh key={`bpost-${px}-${pz}`} position={[px, 1.78, pz]} castShadow>
+            <boxGeometry args={[0.07, 1.56, 0.07]} />
+            <meshStandardMaterial color="#1d2127" metalness={0.7} roughness={0.35} />
+          </mesh>
+        ))
+      )}
+      {/* Techo de vidrio y marco superior */}
+      <mesh position={[0, 2.56, 0]}>
+        <boxGeometry args={[3.94, 0.06, 1.9]} />
+        <meshStandardMaterial color="#1d2127" metalness={0.7} roughness={0.35} />
+      </mesh>
+      <mesh position={[0, 2.57, 0]}>
+        <boxGeometry args={[3.8, 0.03, 1.76]} />
+        <meshStandardMaterial color="#cbd5e1" transparent opacity={0.32} roughness={0.1} />
+      </mesh>
+      {/* Visera frontal inclinada */}
+      <mesh position={[0, 2.38, 1.15]} rotation={[0.25, 0, 0]} castShadow>
+        <boxGeometry args={[3.94, 0.04, 0.58]} />
+        <meshStandardMaterial color="#1d2127" metalness={0.7} roughness={0.35} />
+      </mesh>
+      {/* Tira LED cálida superior */}
+      <mesh position={[0, 2.5, 0.82]}>
+        <boxGeometry args={[3.7, 0.03, 0.04]} />
+        <meshStandardMaterial color="#fef9c3" emissive="#fde68a" emissiveIntensity={1.8} />
+      </mesh>
+
+      {/* Cartel colgante "BOOKS & NEWS" */}
+      <mesh position={[1.05, 2.15, 0.88]} castShadow>
+        <boxGeometry args={[1.18, 0.3, 0.05]} />
+        <meshStandardMaterial map={signTex} roughness={0.4} />
+      </mesh>
+
+      {/* Exhibidor escalonado de revistas y libros (mitad izquierda) */}
+      <group position={[-0.95, 1.25, 0.65]} rotation={[-0.24, 0, 0]}>
+        <mesh castShadow>
+          <boxGeometry args={[1.65, 0.92, 0.36]} />
+          <meshStandardMaterial map={oakTex} roughness={0.65} />
+        </mesh>
+        {[0.28, 0.0, -0.28].map((ry, rowIdx) =>
+          [-0.64, -0.32, 0, 0.32, 0.64].map((rx, colIdx) => (
+            <mesh key={`bk-${rowIdx}-${colIdx}`} position={[rx, ry, 0.2]}>
+              <boxGeometry args={[0.24, 0.22, 0.03]} />
+              <meshStandardMaterial
+                color={bookColors[(rowIdx * 5 + colIdx) % bookColors.length]}
+                roughness={0.45}
+              />
+            </mesh>
+          ))
+        )}
+      </group>
+
+      {/* Caja registradora / POS sobre la mesada derecha */}
+      <group position={[0.45, 1.16, 0.42]}>
+        <mesh castShadow>
+          <boxGeometry args={[0.36, 0.24, 0.28]} />
+          <meshStandardMaterial color="#181b20" roughness={0.4} />
+        </mesh>
+        <mesh position={[0, 0.18, 0.04]} rotation={[-0.35, 0, 0]}>
+          <boxGeometry args={[0.28, 0.18, 0.03]} />
+          <meshStandardMaterial color="#0f172a" emissive="#38bdf8" emissiveIntensity={0.45} />
+        </mesh>
+      </group>
+
+      {/* Pequeña vitrina de vidrio en el extremo derecho */}
+      <mesh position={[1.38, 1.32, 0.45]}>
+        <boxGeometry args={[0.62, 0.58, 0.52]} />
+        <meshStandardMaterial color="#e2e8f0" transparent opacity={0.35} roughness={0.12} />
+      </mesh>
+
+      {/* Estantería trasera de madera */}
+      <mesh position={[0, 1.45, -0.72]} castShadow>
+        <boxGeometry args={[3.65, 0.9, 0.25]} />
+        <meshStandardMaterial map={oakTex} roughness={0.68} />
+      </mesh>
+
+      <pointLight position={[0, 2.15, 0.2]} intensity={2.2} distance={8} color="#fde68a" />
+    </group>
+  );
+}
+
+/**
+ * 04_molinetes_cestos_mapa_3d.jpg
+ * Conjunto de 3 molinetes con tope de madera, cestos de reciclaje y tótem mapa con macetero.
+ */
+export function TurnstileGateSet({ position = [0, 0, 0], rotation = [0, 0, 0] }) {
+  const oakTex = useMemo(() => getWoodTexture('oak'), []);
+  const mapTex = useMemo(() => getTransitMapTexture(), []);
+
+  return (
+    <group position={position} rotation={rotation}>
+      {/* 3 Molinetes paralelos */}
+      {[-1.55, -0.75, 0.05].map((gx, i) => (
+        <group key={`gate-${i}`} position={[gx, 0, 0]}>
+          {/* Cuerpo oscuro */}
+          <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
+            <boxGeometry args={[0.18, 1.0, 1.35]} />
+            <meshStandardMaterial color="#1d2127" metalness={0.55} roughness={0.4} />
+          </mesh>
+          {/* Tapa superior de madera cálida */}
+          <mesh position={[0, 1.02, 0]} castShadow>
+            <boxGeometry args={[0.19, 0.06, 1.37]} />
+            <meshStandardMaterial map={oakTex} roughness={0.6} />
+          </mesh>
+          {/* Lector de tarjeta luminoso */}
+          <mesh position={[0, 1.055, 0.52]}>
+            <boxGeometry args={[0.11, 0.015, 0.14]} />
+            <meshStandardMaterial color="#0284c7" emissive="#38bdf8" emissiveIntensity={1.5} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Puertas de vidrio entre los molinetes */}
+      {[-1.15, -0.35].map((wx, i) => (
+        <mesh key={`wing-${i}`} position={[wx, 0.56, 0.08]}>
+          <boxGeometry args={[0.56, 0.56, 0.03]} />
+          <meshStandardMaterial color="#bae6fd" transparent opacity={0.42} roughness={0.1} />
+        </mesh>
+      ))}
+
+      {/* Estación de 3 cestos de reciclaje con listones de madera */}
+      <group position={[0.92, 0, 0.15]}>
+        <mesh position={[0, 0.44, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.96, 0.88, 0.52]} />
+          <meshStandardMaterial color="#1d2127" roughness={0.55} />
+        </mesh>
+        {[-0.4, -0.28, -0.16, -0.04, 0.08, 0.2, 0.32, 0.42].map((sx, idx) => (
+          <mesh key={`rslat-${idx}`} position={[sx, 0.42, 0.27]} castShadow>
+            <boxGeometry args={[0.05, 0.78, 0.02]} />
+            <meshStandardMaterial map={oakTex} roughness={0.62} />
+          </mesh>
+        ))}
+        {/* 3 bocas de colores */}
+        {['#3b82f6', '#eab308', '#22c55e'].map((bc, idx) => (
+          <mesh key={`bin-${idx}`} position={[-0.28 + idx * 0.28, 0.89, 0]}>
+            <boxGeometry args={[0.2, 0.02, 0.28]} />
+            <meshStandardMaterial color={bc} roughness={0.4} />
+          </mesh>
+        ))}
+      </group>
+
+      {/* Tótem Mapa con macetero verde */}
+      <group position={[2.05, 0, 0.15]}>
+        {/* Macetero oscuro */}
+        <mesh position={[0, 0.26, 0]} castShadow receiveShadow>
+          <boxGeometry args={[1.05, 0.52, 0.48]} />
+          <meshStandardMaterial color="#1d2127" roughness={0.5} />
+        </mesh>
+        {/* Plantas del macetero */}
+        {[-0.32, 0, 0.32].map((px, i) => (
+          <mesh key={`tplant-${i}`} position={[px, 0.58, 0.02]}>
+            <dodecahedronGeometry args={[0.19, 0]} />
+            <meshStandardMaterial color={i === 1 ? '#2f6b3c' : '#3f854d'} roughness={0.85} />
+          </mesh>
+        ))}
+        {/* Postes del tótem */}
+        {[-0.48, 0.48].map((px) => (
+          <mesh key={`tpost-${px}`} position={[px, 1.15, -0.16]} castShadow>
+            <boxGeometry args={[0.07, 2.2, 0.08]} />
+            <meshStandardMaterial color="#1d2127" metalness={0.65} roughness={0.38} />
+          </mesh>
+        ))}
+        {/* Faja de listones de madera bajo el mapa */}
+        <mesh position={[0, 0.82, -0.16]} castShadow>
+          <boxGeometry args={[0.92, 0.24, 0.06]} />
+          <meshStandardMaterial map={oakTex} roughness={0.62} />
+        </mesh>
+        {/* Panel del mapa iluminado */}
+        <mesh position={[0, 1.56, -0.16]} castShadow>
+          <boxGeometry args={[0.92, 1.2, 0.07]} />
+          <meshStandardMaterial color="#1d2127" metalness={0.6} roughness={0.4} />
+        </mesh>
+        <mesh position={[0, 1.56, -0.12]}>
+          <planeGeometry args={[0.84, 1.12]} />
+          <meshStandardMaterial
+            map={mapTex}
+            emissive="#f8fafc"
+            emissiveMap={mapTex}
+            emissiveIntensity={0.4}
+            roughness={0.25}
+          />
+        </mesh>
+      </group>
     </group>
   );
 }

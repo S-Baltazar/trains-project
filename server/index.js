@@ -74,6 +74,27 @@ const UPGRADE_CATALOG = [
     icon: '🕰️',
   },
   {
+    id: 'turnstiles',
+    name: 'Molinetes, Cestos y Mapa',
+    description: 'Instala el control de acceso con molinetes vidriados, cestos de reciclaje y tótem mapa.',
+    cost: 100,
+    icon: '🚧',
+  },
+  {
+    id: 'bookstore',
+    name: 'Librería y Revistero',
+    description: 'Abre un local de libros y revistas con exhibidor de madera e iluminación cálida.',
+    cost: 145,
+    icon: '📚',
+  },
+  {
+    id: 'flower_shop',
+    name: 'Florería Verde Metálica',
+    description: 'Agrega un invernadero metálico verde con flores, plantas colgantes y mostrador.',
+    cost: 160,
+    icon: '💐',
+  },
+  {
     id: 'express_train',
     name: 'Tren Expreso',
     description: 'Moderniza la locomotora y reduce el tiempo de espera entre trenes a 20s.',

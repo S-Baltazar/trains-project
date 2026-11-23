@@ -1,9 +1,9 @@
 {
-  "coins": 914,
-  "streak": 5,
+  "coins": 1364,
+  "streak": 0,
   "bestStreak": 18,
-  "totalAnswered": 49,
-  "totalCorrect": 40,
+  "totalAnswered": 61,
+  "totalCorrect": 49,
   "upgrades": [
     "benches",
     "lamps",

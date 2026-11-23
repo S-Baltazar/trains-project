@@ -439,3 +439,88 @@ export function getClockFaceTexture() {
     return tex;
   });
 }
+
+/**
+ * Cartel "BOOKS & NEWS" para la librería y revistero (03_libreria_revistero_3d.jpg).
+ */
+export function getBookstoreSignTexture() {
+  return getCached('bookstore_sign', () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = '#1b1f24';
+    ctx.fillRect(0, 0, 512, 128);
+
+    ctx.strokeStyle = '#9ca3af';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(8, 8, 496, 112);
+
+    ctx.fillStyle = '#f3efe6';
+    ctx.font = 'bold 50px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('BOOKS & NEWS', 256, 66);
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  });
+}
+
+/**
+ * Mapa de red ferroviaria para el tótem junto a los molinetes (04_molinetes_cestos_mapa_3d.jpg).
+ */
+export function getTransitMapTexture() {
+  return getCached('transit_map', () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 384;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = '#1e2228';
+    ctx.fillRect(0, 0, 384, 512);
+
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = 'bold 24px sans-serif';
+    ctx.fillText('RED DE ESTACIONES', 24, 40);
+
+    ctx.fillStyle = '#f1f5f9';
+    ctx.fillRect(20, 58, 344, 380);
+
+    const lines = [
+      { color: '#2563eb', pts: [[45, 110], [140, 170], [240, 220], [340, 280]] },
+      { color: '#dc2626', pts: [[60, 360], [150, 270], [240, 220], [310, 110]] },
+      { color: '#16a34a', pts: [[45, 230], [160, 230], [240, 220], [340, 200]] },
+      { color: '#d97706', pts: [[180, 80], [190, 190], [200, 320], [220, 410]] },
+    ];
+    for (const line of lines) {
+      ctx.strokeStyle = line.color;
+      ctx.lineWidth = 7;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      line.pts.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
+      ctx.stroke();
+
+      for (const [x, y] of line.pts) {
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+    }
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '16px sans-serif';
+    ctx.fillText('Líneas A • B • C • Sarmiento', 24, 476);
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  });
+}
