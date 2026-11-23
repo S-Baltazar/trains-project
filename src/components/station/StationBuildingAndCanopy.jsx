@@ -214,17 +214,6 @@ export default function StationBuildingAndCanopy() {
         <meshStandardMaterial map={concreteTex} color="#d4d7db" roughness={0.78} />
       </mesh>
 
-      {/* EXPLANADA TRASERA PARA LOCALES Y MOLINETES (completa el fondo gris de la estación) */}
-      <mesh position={[14.9, 0.38, 0]} receiveShadow castShadow>
-        <boxGeometry args={[7.2, 0.76, 31.6]} />
-        <meshStandardMaterial color="#2b303a" roughness={0.85} />
-      </mesh>
-      <mesh position={[14.9, 0.83, 0]} receiveShadow castShadow>
-        <boxGeometry args={[7.4, 0.14, 32]} />
-        <meshStandardMaterial map={concreteTex} color="#cbd5e1" roughness={0.8} />
-      </mesh>
-      <pointLight position={[15.0, 4.5, 0]} intensity={2.0} distance={22} color="#e2e8f0" />
-
       {/* Franja podotáctil + línea amarilla de seguridad */}
       <mesh position={[2.22, 0.905, 0]} receiveShadow>
         <boxGeometry args={[0.42, 0.015, 31.8]} />

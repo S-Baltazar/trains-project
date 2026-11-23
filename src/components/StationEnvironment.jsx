@@ -53,8 +53,8 @@ export default function StationEnvironment() {
       {/* MEJORA 1: Bancos Lineales de Listones (01_banco_lineal_listones_3d.jpg) */}
       {hasBenches && (
         <>
-          <SlattedLinearBench position={[8.0, 0.9, -7.0]} />
-          <SlattedLinearBench position={[8.0, 0.9, 7.0]} />
+          <SlattedLinearBench position={[6.6, 0.9, -7.0]} />
+          <SlattedLinearBench position={[6.6, 0.9, 7.0]} />
         </>
       )}
 
@@ -94,19 +94,19 @@ export default function StationEnvironment() {
       {/* MEJORA 7: Barra de Café Isla (08_barra_cafe_isla_3d.jpg) */}
       {hasCafe && <IslandCoffeeBar position={[6.8, 0.9, 2.2]} />}
 
-      {/* MEJORA 8: Molinetes, Cestos y Mapa (04_molinetes_cestos_mapa_3d.jpg) */}
+      {/* MEJORA 8: Molinetes, Cestos y Mapa en el arco central frontal (04_molinetes_cestos_mapa_3d.jpg) */}
       {hasTurnstiles && (
-        <TurnstileGateSet position={[13.6, 0.9, 0.0]} rotation={[0, Math.PI / 2, 0]} />
+        <TurnstileGateSet position={[10.0, 0.9, -0.45]} rotation={[0, -Math.PI / 2, 0]} />
       )}
 
-      {/* MEJORA 9: Librería y Revistero (03_libreria_revistero_3d.jpg) */}
+      {/* MEJORA 9: Librería y Revistero en el arco izquierdo frontal (03_libreria_revistero_3d.jpg) */}
       {hasBookstore && (
-        <BookstoreNewsstand position={[14.4, 0.9, -6.5]} rotation={[0, Math.PI / 2, 0]} />
+        <BookstoreNewsstand position={[9.95, 0.9, -7.0]} rotation={[0, -Math.PI / 2, 0]} />
       )}
 
-      {/* MEJORA 10: Florería Verde Metálica (02_floreria_verde_metalica_3d.jpg) */}
+      {/* MEJORA 10: Florería Verde Metálica en el arco derecho frontal (02_floreria_verde_metalica_3d.jpg) */}
       {hasFlowerShop && (
-        <FlowerShopPavilion position={[14.4, 0.9, 6.5]} rotation={[0, Math.PI / 2, 0]} />
+        <FlowerShopPavilion position={[9.95, 0.9, 7.0]} rotation={[0, -Math.PI / 2, 0]} />
       )}
 
       {/* MEJORA 8: Torre del Reloj sobre el edificio histórico */}

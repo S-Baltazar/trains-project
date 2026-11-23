@@ -1,9 +1,9 @@
 {
-  "coins": 1364,
+  "coins": 1057,
   "streak": 0,
   "bestStreak": 18,
-  "totalAnswered": 61,
-  "totalCorrect": 49,
+  "totalAnswered": 66,
+  "totalCorrect": 52,
   "upgrades": [
     "benches",
     "lamps",
@@ -13,6 +13,9 @@
     "clock_tower",
     "bench_curved",
     "bench_double",
-    "totem_screens"
+    "totem_screens",
+    "turnstiles",
+    "bookstore",
+    "flower_shop"
   ]
 }
