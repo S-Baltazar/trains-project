@@ -53,6 +53,32 @@ function CameraRig({ controlsRef }) {
   const moveVec = useRef(new THREE.Vector3());
 
   useEffect(() => {
+    const updateProjection = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight || 1;
+      const aspect = w / h;
+      // Amplía ligeramente el FOV en vertical para no recortar la estación y lo ajusta al girar a horizontal
+      camera.fov = aspect < 1 ? 58 : 45;
+      camera.aspect = aspect;
+      camera.updateProjectionMatrix();
+    };
+    const onOrientation = () => {
+      updateProjection();
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+        updateProjection();
+      }, 150);
+    };
+    updateProjection();
+    window.addEventListener('resize', updateProjection);
+    window.addEventListener('orientationchange', onOrientation);
+    return () => {
+      window.removeEventListener('resize', updateProjection);
+      window.removeEventListener('orientationchange', onOrientation);
+    };
+  }, [camera]);
+
+  useEffect(() => {
     const cfg = CAMERA_TARGETS[cameraPreset] || CAMERA_TARGETS.overview;
     camera.position.set(...cfg.pos);
     if (controlsRef.current) {

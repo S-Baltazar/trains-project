@@ -68,6 +68,21 @@ export default function HUD() {
   const [secondsLeft, setSecondsLeft] = useState(30);
   const [hudCollapsed, setHudCollapsed] = useState(false);
 
+  const toggleFullscreenLandscape = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen?.();
+        if (window.screen?.orientation?.lock) {
+          await window.screen.orientation.lock('landscape').catch(() => {});
+        }
+      } else {
+        await document.exitFullscreen?.();
+      }
+    } catch {
+      // Navegadores iOS no soportan Fullscreen API en div raíz
+    }
+  };
+
   useEffect(() => {
     if (phase !== 'WAITING') return;
     const onKeyDown = (e) => {
@@ -198,6 +213,9 @@ export default function HUD() {
               ))}
               <button className="btn-mini" onClick={toggleMuted} title="Silenciar o activar sonido">
                 {muted ? '🔇' : '🔊'}
+              </button>
+              <button className="btn-mini" onClick={toggleFullscreenLandscape} title="Pantalla completa horizontal">
+                ⛶
               </button>
             </div>
 
