@@ -1,15 +1,36 @@
 {
-  "coins": 103,
-  "streak": 1,
-  "bestStreak": 1,
-  "totalAnswered": 1,
-  "totalCorrect": 1,
-  "upgrades": [],
-  "unlockedTrains": [
-    "sarmiento"
+  "coins": 10516,
+  "streak": 3,
+  "bestStreak": 3,
+  "totalAnswered": 3,
+  "totalCorrect": 3,
+  "upgrades": [
+    "benches",
+    "bench_curved",
+    "lamps",
+    "bench_double",
+    "ticket_kiosk",
+    "totem_screens",
+    "cafe",
+    "clock_tower",
+    "turnstiles",
+    "bookstore",
+    "flower_shop",
+    "express_train"
   ],
-  "selectedTrain": "sarmiento",
+  "unlockedTrains": [
+    "sarmiento",
+    "double_decker",
+    "suburban_electric",
+    "diesel_express"
+  ],
+  "selectedTrain": "double_decker",
   "unlockedAchievements": [
-    "first_correct"
-  ]
+    "first_correct",
+    "upgrades_3",
+    "trains_2",
+    "upgrades_all",
+    "streak_3"
+  ],
+  "sandboxMode": true
 }
