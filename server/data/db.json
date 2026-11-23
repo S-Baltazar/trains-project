@@ -1,25 +1,28 @@
 {
-  "coins": 1382,
+  "coins": 492,
   "streak": 0,
-  "bestStreak": 18,
-  "totalAnswered": 80,
-  "totalCorrect": 60,
+  "bestStreak": 33,
+  "totalAnswered": 39,
+  "totalCorrect": 33,
   "upgrades": [
     "benches",
-    "lamps",
-    "ticket_kiosk",
-    "cafe",
-    "express_train",
-    "clock_tower",
     "bench_curved",
+    "lamps",
     "bench_double",
+    "ticket_kiosk",
     "totem_screens",
+    "cafe",
     "turnstiles",
     "bookstore",
-    "flower_shop"
+    "flower_shop",
+    "express_train",
+    "clock_tower"
   ],
   "unlockedTrains": [
-    "sarmiento"
+    "sarmiento",
+    "double_decker",
+    "suburban_electric",
+    "diesel_express"
   ],
-  "selectedTrain": "sarmiento"
+  "selectedTrain": "diesel_express"
 }

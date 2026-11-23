@@ -171,5 +171,215 @@
     "question": "¿Cuál es el mamífero terrestre más rápido del mundo?",
     "options": ["León", "Guepardo", "Antílope", "Caballo"],
     "correctIndex": 1
+  },
+  {
+    "id": "q25",
+    "category": "Ferrocarriles",
+    "question": "¿Qué nombre recibe el dispositivo en el techo de un tren eléctrico que toma energía de la catenaria?",
+    "options": ["Alternador", "Pantógrafo", "Bogie", "Inversor"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q26",
+    "category": "Ferrocarriles",
+    "question": "¿Cómo se llama el conjunto de ejes y ruedas articulado bajo un coche ferroviario?",
+    "options": ["Chasis", "Bogie", "Durmiente", "Balasto"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q27",
+    "category": "Ferrocarriles",
+    "question": "¿Para qué sirve la piedra partida o balasto debajo de las vías del tren?",
+    "options": ["Decorar la estación", "Distribuir cargas y drenar agua", "Generar electricidad", "Frenar la locomotora"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q28",
+    "category": "Ferrocarriles",
+    "question": "¿Qué línea ferroviaria argentina une la estación Once con Moreno?",
+    "options": ["Línea Roca", "Línea Mitre", "Línea Sarmiento", "Línea San Martín"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q29",
+    "category": "Ferrocarriles",
+    "question": "¿En qué ciudad se inauguró el primer ferrocarril subterráneo del mundo en 1863?",
+    "options": ["París", "Nueva York", "Londres", "Berlín"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q30",
+    "category": "Ferrocarriles",
+    "question": "¿Qué país opera los famosos trenes de alta velocidad TGV?",
+    "options": ["Italia", "España", "Francia", "Bélgica"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q31",
+    "category": "Geografía",
+    "question": "¿Cuál es el océano más grande y profundo de la Tierra?",
+    "options": ["Atlántico", "Índico", "Pacífico", "Ártico"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q32",
+    "category": "Geografía",
+    "question": "¿Qué cordillera atraviesa América del Sur de norte a sur?",
+    "options": ["Los Alpes", "Los Andes", "El Himalaya", "Las Rocosas"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q33",
+    "category": "Geografía",
+    "question": "¿Cuál es el país con mayor superficie territorial del mundo?",
+    "options": ["Canadá", "China", "Estados Unidos", "Rusia"],
+    "correctIndex": 3
+  },
+  {
+    "id": "q34",
+    "category": "Geografía",
+    "question": "¿En qué país se encuentra la ciudad de Estambul?",
+    "options": ["Grecia", "Turquía", "Egipto", "Bulgaria"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q35",
+    "category": "Astronomía",
+    "question": "¿Cuál es el planeta más cercano al Sol?",
+    "options": ["Venus", "Marte", "Mercurio", "Tierra"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q36",
+    "category": "Astronomía",
+    "question": "¿Qué planeta es conocido por su gran mancha roja y sus lunas galileanas?",
+    "options": ["Marte", "Júpiter", "Saturno", "Neptuno"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q37",
+    "category": "Astronomía",
+    "question": "¿Cómo se llama la galaxia en la que se encuentra el sistema solar?",
+    "options": ["Andrómeda", "Vía Láctea", "Sombrero", "Triángulo"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q38",
+    "category": "Biología",
+    "question": "¿Qué orgánulo celular es conocido como la 'central energética' de la célula?",
+    "options": ["Ribosoma", "Núcleo", "Mitocondria", "Lisosoma"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q39",
+    "category": "Biología",
+    "question": "¿Qué gas liberan las plantas principalmente durante la fotosíntesis?",
+    "options": ["Dióxido de carbono", "Nitrógeno", "Oxígeno", "Metano"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q40",
+    "category": "Biología",
+    "question": "¿Cuál es el órgano más grande del cuerpo humano?",
+    "options": ["Hígado", "Pulmón", "La piel", "Intestino"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q41",
+    "category": "Historia",
+    "question": "¿En qué año cayó el Muro de Berlín?",
+    "options": ["1985", "1989", "1991", "1993"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q42",
+    "category": "Historia",
+    "question": "¿Quién fue la primera mujer en ganar un Premio Nobel?",
+    "options": ["Rosalind Franklin", "Marie Curie", "Ada Lovelace", "Jane Goodall"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q43",
+    "category": "Historia",
+    "question": "¿En qué año se declaró la Independencia de Argentina en Tucumán?",
+    "options": ["1810", "1812", "1816", "1820"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q44",
+    "category": "Tecnología",
+    "question": "¿Qué significan las siglas CPU en informática?",
+    "options": ["Central Process Unit", "Central Processing Unit", "Computer Personal Unit", "Core Power Unit"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q45",
+    "category": "Tecnología",
+    "question": "¿Quién es considerada la primera programadora de computadoras de la historia?",
+    "options": ["Grace Hopper", "Ada Lovelace", "Margaret Hamilton", "Hedy Lamarr"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q46",
+    "category": "Tecnología",
+    "question": "¿Qué protocolo se utiliza principalmente para transferir páginas web en Internet?",
+    "options": ["FTP", "SMTP", "HTTP", "SSH"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q47",
+    "category": "Arte y Literatura",
+    "question": "¿Quién escribió 'Don Quijote de la Mancha'?",
+    "options": ["Lope de Vega", "Miguel de Cervantes", "Francisco de Quevedo", "Federico García Lorca"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q48",
+    "category": "Arte y Literatura",
+    "question": "¿En qué museo de París se exhibe la Mona Lisa de Leonardo da Vinci?",
+    "options": ["Museo de Orsay", "Centro Pompidou", "Museo del Louvre", "Museo Rodin"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q49",
+    "category": "Ciencia",
+    "question": "¿Cuál es la fórmula química del agua?",
+    "options": ["CO2", "H2O", "O2", "NaCl"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q50",
+    "category": "Ciencia",
+    "question": "¿A qué temperatura hierve el agua a nivel del mar en grados Celsius?",
+    "options": ["90 °C", "100 °C", "110 °C", "120 °C"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q51",
+    "category": "Deportes",
+    "question": "¿Cada cuántos años se celebran los Juegos Olímpicos de Verano?",
+    "options": ["Cada 2 años", "Cada 3 años", "Cada 4 años", "Cada 5 años"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q52",
+    "category": "Deportes",
+    "question": "¿Cuántos jugadores tiene un equipo de fútbol en el campo durante un partido?",
+    "options": ["9", "10", "11", "12"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q53",
+    "category": "Cultura General",
+    "question": "¿Cuántos minutos tiene una hora y media?",
+    "options": ["75", "80", "90", "100"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q54",
+    "category": "Cultura General",
+    "question": "¿Qué instrumento musical tiene 88 teclas en su versión estándar moderna?",
+    "options": ["Acordeón", "Órgano", "Piano", "Clave"],
+    "correctIndex": 2
   }
 ]

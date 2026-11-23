@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { generateProceduralQuestion } from './triviaGenerator.js';
 
 dotenv.config();
 
@@ -208,13 +209,39 @@ app.get('/api/station', (_req, res) => {
   res.json(buildStationPayload(state));
 });
 
+const recentQuestionIds = [];
+const RECENT_LIMIT = 45;
+const generatedQuestionsCache = new Map();
+
+function rememberQuestionId(id) {
+  recentQuestionIds.push(id);
+  if (recentQuestionIds.length > RECENT_LIMIT) {
+    recentQuestionIds.shift();
+  }
+}
+
 app.get('/api/trivia/next', (req, res) => {
   const questions = loadQuestions();
   const lastId = req.query.lastId;
-  const pool = questions.length > 1 && lastId
-    ? questions.filter((q) => q.id !== lastId)
-    : questions;
-  const picked = pool[Math.floor(Math.random() * pool.length)];
+  const freshCurated = questions.filter(
+    (q) => q.id !== lastId && !recentQuestionIds.includes(q.id)
+  );
+
+  let picked;
+  // Mezcla preguntas curadas no vistas recientemente y preguntas procedurales únicas
+  const useProcedural = freshCurated.length === 0 || Math.random() < 0.45;
+  if (useProcedural) {
+    picked = generateProceduralQuestion();
+    generatedQuestionsCache.set(picked.id, picked);
+    if (generatedQuestionsCache.size > 150) {
+      const oldestKey = generatedQuestionsCache.keys().next().value;
+      generatedQuestionsCache.delete(oldestKey);
+    }
+  } else {
+    picked = freshCurated[Math.floor(Math.random() * freshCurated.length)];
+  }
+
+  rememberQuestionId(picked.id);
 
   // No enviamos correctIndex al cliente para evitar trampas en el navegador
   res.json({
@@ -228,7 +255,8 @@ app.get('/api/trivia/next', (req, res) => {
 app.post('/api/trivia/answer', (req, res) => {
   const { questionId, selectedIndex } = req.body ?? {};
   const questions = loadQuestions();
-  const question = questions.find((q) => q.id === questionId);
+  const question =
+    questions.find((q) => q.id === questionId) || generatedQuestionsCache.get(questionId);
 
   if (!question) {
     return res.status(404).json({ error: 'Pregunta no encontrada' });
