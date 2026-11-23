@@ -402,37 +402,35 @@ export function getTicketKioskScreenTexture() {
 }
 
 /**
- * Esfera de reloj ferroviario clásico (06_modulo_anden_3d.jpg).
+ * Esfera de reloj ferroviario clásico (12_reloj_circular_3d.jpg).
  */
 export function getClockFaceTexture() {
   return getCached('clock_face', () => {
     const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 256;
+    canvas.width = 512;
+    canvas.height = 512;
     const ctx = canvas.getContext('2d');
+    const cx = 256;
+    const cy = 256;
 
-    ctx.fillStyle = '#f4f1ea';
+    // Fondo crema cálido
+    ctx.fillStyle = '#f2ede1';
     ctx.beginPath();
-    ctx.arc(128, 128, 124, 0, Math.PI * 2);
+    ctx.arc(cx, cy, 250, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.strokeStyle = '#1f2328';
-    ctx.lineWidth = 6;
-    ctx.beginPath();
-    ctx.arc(128, 128, 118, 0, Math.PI * 2);
-    ctx.stroke();
-
-    for (let i = 0; i < 12; i++) {
-      const ang = (i / 12) * Math.PI * 2;
-      const x1 = 128 + Math.cos(ang) * 94;
-      const y1 = 128 + Math.sin(ang) * 94;
-      const x2 = 128 + Math.cos(ang) * 110;
-      const y2 = 128 + Math.sin(ang) * 110;
-      ctx.strokeStyle = '#1f2328';
-      ctx.lineWidth = i % 3 === 0 ? 5 : 3;
+    // 60 marcas de minutos y 12 marcas de horas (sin números, estilo ferroviario)
+    for (let i = 0; i < 60; i++) {
+      const ang = (i / 60) * Math.PI * 2 - Math.PI / 2;
+      const isHour = i % 5 === 0;
+      const isQuarter = i % 15 === 0;
+      const rOuter = 234;
+      const rInner = isQuarter ? 186 : isHour ? 196 : 216;
+      ctx.strokeStyle = '#1b1e23';
+      ctx.lineWidth = isQuarter ? 9 : isHour ? 6 : 3;
       ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
+      ctx.moveTo(cx + Math.cos(ang) * rInner, cy + Math.sin(ang) * rInner);
+      ctx.lineTo(cx + Math.cos(ang) * rOuter, cy + Math.sin(ang) * rOuter);
       ctx.stroke();
     }
 

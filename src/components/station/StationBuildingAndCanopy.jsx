@@ -1,12 +1,15 @@
 import { useMemo } from 'react';
-import * as THREE from 'three';
 import {
   getBallastTexture,
   getBrickTexture,
-  getClockFaceTexture,
   getConcreteSlabTexture,
   getTactileStripTexture,
 } from './textures.js';
+import {
+  HangingStationClock,
+  SuspendedLinearLamp,
+  WallBracketLantern,
+} from './StationFurniture.jsx';
 
 const ARCH_CENTERS = [-7, 0, 7];
 const COLUMN_ZS = [-10.5, -3.5, 3.5, 10.5];
@@ -70,7 +73,7 @@ function TrashBin({ position }) {
   );
 }
 
-function BrickArchBay({ zCenter, brickTex, clockTex, minuteHandRef, hourHandRef, hasClock }) {
+function BrickArchBay({ zCenter, brickTex }) {
   const archSegments = useMemo(() => {
     const segs = [];
     const count = 11;
@@ -90,17 +93,19 @@ function BrickArchBay({ zCenter, brickTex, clockTex, minuteHandRef, hourHandRef,
       {/* Pared trasera del nicho abovedado */}
       <mesh position={[1.9, 2.3, 0]} receiveShadow>
         <boxGeometry args={[0.35, 4.6, 5.2]} />
-        <meshStandardMaterial map={brickTex} color="#7c685a" roughness={0.9} />
+        <meshStandardMaterial map={brickTex} color="#a08876" roughness={0.88} />
       </mesh>
-      {/* Sombra interior del nicho */}
+      {/* Fondo interior iluminado del nicho */}
       <mesh position={[1.72, 2.3, 0]}>
         <boxGeometry args={[0.04, 4.4, 4.8]} />
-        <meshStandardMaterial color="#2a2420" roughness={0.95} />
+        <meshStandardMaterial color="#4a3f38" roughness={0.9} />
       </mesh>
+      {/* Iluminación cálida interior del arco para evitar que el fondo se vea oscuro */}
+      <pointLight position={[0.9, 3.6, 0]} intensity={2.8} distance={9} color="#fde68a" />
       {/* Techo del nicho */}
       <mesh position={[0.95, 4.55, 0]}>
         <boxGeometry args={[1.9, 0.2, 5.2]} />
-        <meshStandardMaterial color="#3b332d" roughness={0.9} />
+        <meshStandardMaterial color="#4b4139" roughness={0.88} />
       </mesh>
 
       {/* Enjutas de ladrillo sobre el arco */}
@@ -132,40 +137,15 @@ function BrickArchBay({ zCenter, brickTex, clockTex, minuteHandRef, hourHandRef,
           </mesh>
         ))}
       </group>
-
-      {/* Reloj de estación en el arco central (06_modulo_anden_3d.jpg) */}
-      {hasClock && (
-        <group position={[0.12, 3.65, 0]}>
-          <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
-            <cylinderGeometry args={[0.52, 0.52, 0.14, 24]} />
-            <meshStandardMaterial color="#1f2328" metalness={0.6} roughness={0.35} />
-          </mesh>
-          <mesh position={[-0.08, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
-            <circleGeometry args={[0.46, 24]} />
-            <meshStandardMaterial map={clockTex} roughness={0.4} />
-          </mesh>
-          <group position={[-0.095, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
-            <mesh ref={minuteHandRef}>
-              <boxGeometry args={[0.03, 0.34, 0.015]} />
-              <meshStandardMaterial color="#111827" />
-            </mesh>
-            <mesh ref={hourHandRef}>
-              <boxGeometry args={[0.04, 0.22, 0.015]} />
-              <meshStandardMaterial color="#991b1b" />
-            </mesh>
-          </group>
-        </group>
-      )}
     </group>
   );
 }
 
-export default function StationBuildingAndCanopy({ minuteHandRef, hourHandRef }) {
+export default function StationBuildingAndCanopy() {
   const brickTex = useMemo(() => getBrickTexture(), []);
   const concreteTex = useMemo(() => getConcreteSlabTexture(), []);
   const tactileTex = useMemo(() => getTactileStripTexture(), []);
   const ballastTex = useMemo(() => getBallastTexture(), []);
-  const clockTex = useMemo(() => getClockFaceTexture(), []);
 
   const sleeperPositions = useMemo(() => {
     const arr = [];
@@ -245,15 +225,16 @@ export default function StationBuildingAndCanopy({ minuteHandRef, hourHandRef })
       </mesh>
 
       {/* EDIFICIO HISTÓRICO DE LADRILLO Y ARCOS (06_modulo_anden_3d.jpg) */}
-      {ARCH_CENTERS.map((zc, idx) => (
-        <BrickArchBay
-          key={zc}
-          zCenter={zc}
-          brickTex={brickTex}
-          clockTex={clockTex}
-          minuteHandRef={minuteHandRef}
-          hourHandRef={hourHandRef}
-          hasClock={idx === 1}
+      {ARCH_CENTERS.map((zc) => (
+        <BrickArchBay key={zc} zCenter={zc} brickTex={brickTex} />
+      ))}
+
+      {/* Faroles de pared en las pilastras del fondo (13_faroles_iluminacion_3d.jpg) */}
+      {[-10.5, -3.5, 3.5, 10.5].map((pz) => (
+        <WallBracketLantern
+          key={`wall-lamp-${pz}`}
+          position={[9.05, 3.4, pz]}
+          rotation={[0, -Math.PI / 2, 0]}
         />
       ))}
 
@@ -368,6 +349,19 @@ export default function StationBuildingAndCanopy({ minuteHandRef, hourHandRef })
             <meshStandardMaterial color="#2e343d" metalness={0.65} roughness={0.4} />
           </mesh>
         </group>
+      ))}
+
+      {/* Reloj circular colgante doble faz bajo la cabriada central (12_reloj_circular_3d.jpg) */}
+      <HangingStationClock position={[5.9, 3.45, 0]} />
+
+      {/* Luminarias lineales colgantes bajo la cubierta (13_faroles_iluminacion_3d.jpg) */}
+      {[-8, -4, 4, 8].map((lz) => (
+        <SuspendedLinearLamp
+          key={`linear-lamp-${lz}`}
+          position={[5.9, 3.85, lz]}
+          rotation={[0, Math.PI / 2, 0]}
+          drop={0.65}
+        />
       ))}
 
       {/* Paneles de vidrio traslúcido a dos aguas */}

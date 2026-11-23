@@ -4,6 +4,7 @@ import { useGameStore } from '../store/gameStore.js';
 import StationBuildingAndCanopy from './station/StationBuildingAndCanopy.jsx';
 import {
   AtmKioskModule,
+  ClassicLampPost,
   CurvedErgonomicBench,
   DepartureTotem,
   DoubleSidedBench,
@@ -17,8 +18,6 @@ import { getBrickTexture, getClockFaceTexture } from './station/textures.js';
  */
 export default function StationEnvironment() {
   const upgrades = useGameStore((s) => s.upgrades);
-  const minuteHandRef = useRef(null);
-  const hourHandRef = useRef(null);
   const towerMinuteRef = useRef(null);
   const towerHourRef = useRef(null);
 
@@ -27,8 +26,6 @@ export default function StationEnvironment() {
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
-    if (minuteHandRef.current) minuteHandRef.current.rotation.z = -t * 0.4;
-    if (hourHandRef.current) hourHandRef.current.rotation.z = -t * 0.05;
     if (towerMinuteRef.current) towerMinuteRef.current.rotation.z = -t * 0.4;
     if (towerHourRef.current) towerHourRef.current.rotation.z = -t * 0.05;
   });
@@ -45,7 +42,7 @@ export default function StationEnvironment() {
   return (
     <group>
       {/* Estación base fiel a 06_modulo_anden_3d.jpg */}
-      <StationBuildingAndCanopy minuteHandRef={minuteHandRef} hourHandRef={hourHandRef} />
+      <StationBuildingAndCanopy />
 
       {/* MEJORA 1: Bancos Lineales de Listones (01_banco_lineal_listones_3d.jpg) */}
       {hasBenches && (
@@ -71,24 +68,10 @@ export default function StationEnvironment() {
         </>
       )}
 
-      {/* MEJORA 4: Farolas Clásicas */}
+      {/* MEJORA 4: Farolas Clásicas (13_faroles_iluminacion_3d.jpg) */}
       {hasLamps &&
         [-13.5, -5.0, 5.0, 13.5].map((lz) => (
-          <group key={lz} position={[2.6, 0.9, lz]}>
-            <mesh position={[0, 1.7, 0]} castShadow>
-              <cylinderGeometry args={[0.07, 0.11, 3.4, 10]} />
-              <meshStandardMaterial color="#1f2328" metalness={0.7} roughness={0.3} />
-            </mesh>
-            <mesh position={[0, 3.55, 0]}>
-              <sphereGeometry args={[0.24, 12, 12]} />
-              <meshStandardMaterial
-                color="#fef08a"
-                emissive="#fde047"
-                emissiveIntensity={2.0}
-              />
-            </mesh>
-            <pointLight position={[0, 3.5, 0]} intensity={2.8} distance={9} color="#fde68a" />
-          </group>
+          <ClassicLampPost key={lz} position={[2.6, 0.9, lz]} />
         ))}
 
       {/* MEJORA 5: Módulo de Cajeros y Boletería (10_modulo_cajeros_3d.jpg) */}

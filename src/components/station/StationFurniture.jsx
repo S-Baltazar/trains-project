@@ -1,7 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import {
   getAtmScreenTexture,
+  getClockFaceTexture,
   getDepartureScreenTexture,
   getMenuBoardTexture,
   getTicketKioskScreenTexture,
@@ -675,6 +677,344 @@ export function DepartureTotem({ position = [0, 0, 0], rotation = [0, 0, 0] }) {
           roughness={0.2}
         />
       </mesh>
+    </group>
+  );
+}
+
+/**
+ * 12_reloj_circular_3d.jpg
+ * Reloj ferroviario circular colgante doble faz con marco de madera y hierro negro.
+ */
+export function HangingStationClock({ position = [0, 0, 0], rotation = [0, 0, 0] }) {
+  const oakTex = useMemo(() => getWoodTexture('oak'), []);
+  const clockTex = useMemo(() => getClockFaceTexture(), []);
+  const frontMinRef = useRef(null);
+  const frontHourRef = useRef(null);
+  const backMinRef = useRef(null);
+  const backHourRef = useRef(null);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    if (frontMinRef.current) frontMinRef.current.rotation.z = -t * 0.4;
+    if (frontHourRef.current) frontHourRef.current.rotation.z = -t * 0.05;
+    if (backMinRef.current) backMinRef.current.rotation.z = t * 0.4;
+    if (backHourRef.current) backHourRef.current.rotation.z = t * 0.05;
+  });
+
+  return (
+    <group position={position} rotation={rotation}>
+      {/* Placa de anclaje superior al techo/cabriada */}
+      <mesh position={[0, 1.04, 0]} castShadow>
+        <boxGeometry args={[0.24, 0.05, 0.14]} />
+        <meshStandardMaterial color="#1c2026" metalness={0.75} roughness={0.35} />
+      </mesh>
+      {/* Dos varillas verticales paralelas de suspensión */}
+      {[-0.06, 0.06].map((rx) => (
+        <mesh key={rx} position={[rx, 0.74, 0]} castShadow>
+          <boxGeometry args={[0.032, 0.58, 0.032]} />
+          <meshStandardMaterial color="#1c2026" metalness={0.75} roughness={0.35} />
+        </mesh>
+      ))}
+      {/* Abrazadera superior sobre el tambor */}
+      <mesh position={[0, 0.47, 0]} castShadow>
+        <boxGeometry args={[0.18, 0.05, 0.18]} />
+        <meshStandardMaterial color="#1c2026" metalness={0.75} roughness={0.35} />
+      </mesh>
+
+      {/* Tambor metálico oscuro */}
+      <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.47, 0.47, 0.22, 32]} />
+        <meshStandardMaterial color="#1e2228" metalness={0.65} roughness={0.38} />
+      </mesh>
+
+      {/* Aros exteriores de madera (frente y dorso) */}
+      {[-0.095, 0.095].map((bz) => (
+        <mesh key={`wood-${bz}`} position={[0, 0, bz]} castShadow>
+          <torusGeometry args={[0.455, 0.032, 12, 36]} />
+          <meshStandardMaterial map={oakTex} roughness={0.6} />
+        </mesh>
+      ))}
+
+      {/* Aros interiores de hierro negro (frente y dorso) */}
+      {[-0.108, 0.108].map((bz) => (
+        <mesh key={`iron-${bz}`} position={[0, 0, bz]}>
+          <torusGeometry args={[0.425, 0.022, 10, 36]} />
+          <meshStandardMaterial color="#181b20" metalness={0.7} roughness={0.35} />
+        </mesh>
+      ))}
+
+      {/* Esfera frontal (+Z) */}
+      <mesh position={[0, 0, 0.112]}>
+        <circleGeometry args={[0.415, 32]} />
+        <meshStandardMaterial
+          map={clockTex}
+          emissive="#fef3c7"
+          emissiveIntensity={0.2}
+          roughness={0.45}
+        />
+      </mesh>
+      <group position={[0, 0, 0.122]}>
+        <mesh ref={frontMinRef}>
+          <boxGeometry args={[0.022, 0.31, 0.012]} />
+          <meshStandardMaterial color="#181b20" />
+        </mesh>
+        <mesh ref={frontHourRef}>
+          <boxGeometry args={[0.03, 0.21, 0.012]} />
+          <meshStandardMaterial color="#181b20" />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.028, 0.028, 0.018, 12]} />
+          <meshStandardMaterial color="#181b20" metalness={0.6} roughness={0.35} />
+        </mesh>
+      </group>
+
+      {/* Esfera trasera (-Z) */}
+      <mesh position={[0, 0, -0.112]} rotation={[0, Math.PI, 0]}>
+        <circleGeometry args={[0.415, 32]} />
+        <meshStandardMaterial
+          map={clockTex}
+          emissive="#fef3c7"
+          emissiveIntensity={0.2}
+          roughness={0.45}
+        />
+      </mesh>
+      <group position={[0, 0, -0.122]} rotation={[0, Math.PI, 0]}>
+        <mesh ref={backMinRef}>
+          <boxGeometry args={[0.022, 0.31, 0.012]} />
+          <meshStandardMaterial color="#181b20" />
+        </mesh>
+        <mesh ref={backHourRef}>
+          <boxGeometry args={[0.03, 0.21, 0.012]} />
+          <meshStandardMaterial color="#181b20" />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.028, 0.028, 0.018, 12]} />
+          <meshStandardMaterial color="#181b20" metalness={0.6} roughness={0.35} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+/**
+ * Pieza compartida: farol de vidrio cónico de 4 caras (13_faroles_iluminacion_3d.jpg).
+ */
+function LanternHead({ position = [0, 0, 0], scale = 1 }) {
+  const cornerAngles = [Math.PI / 4, (3 * Math.PI) / 4, (5 * Math.PI) / 4, (7 * Math.PI) / 4];
+
+  return (
+    <group position={position} scale={scale}>
+      {/* Base metálica del farol */}
+      <mesh position={[0, 0.03, 0]} castShadow>
+        <cylinderGeometry args={[0.14, 0.1, 0.06, 4]} />
+        <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.35} />
+      </mesh>
+      {/* Vidrio troncopiramidal */}
+      <mesh position={[0, 0.26, 0]} rotation={[0, Math.PI / 4, 0]}>
+        <cylinderGeometry args={[0.2, 0.13, 0.42, 4]} />
+        <meshStandardMaterial
+          color="#e2e8f0"
+          transparent
+          opacity={0.38}
+          roughness={0.12}
+          metalness={0.2}
+        />
+      </mesh>
+      {/* 4 montantes metálicos en las esquinas */}
+      {cornerAngles.map((ang, i) => (
+        <mesh
+          key={i}
+          position={[Math.cos(ang) * 0.16, 0.26, Math.sin(ang) * 0.16]}
+          rotation={[0, -ang, 0]}
+        >
+          <boxGeometry args={[0.022, 0.43, 0.022]} />
+          <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.35} />
+        </mesh>
+      ))}
+      {/* Tubo luminoso cálido vertical interior */}
+      <mesh position={[0, 0.26, 0]}>
+        <cylinderGeometry args={[0.024, 0.024, 0.34, 10]} />
+        <meshStandardMaterial
+          color="#fef9c3"
+          emissive="#fde68a"
+          emissiveIntensity={2.6}
+        />
+      </mesh>
+      {/* Techo piramidal escalonado + remate esférico */}
+      <mesh position={[0, 0.52, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
+        <coneGeometry args={[0.24, 0.14, 4]} />
+        <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.35} />
+      </mesh>
+      <mesh position={[0, 0.61, 0]} castShadow>
+        <sphereGeometry args={[0.035, 10, 10]} />
+        <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.35} />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * 13_faroles_iluminacion_3d.jpg (izquierda)
+ * Farol clásico de pie con base de hierro fundido, fuste con sección de madera y cabezal vidriado.
+ */
+export function ClassicLampPost({ position = [0, 0, 0], castLight = true }) {
+  const oakTex = useMemo(() => getWoodTexture('oak'), []);
+
+  return (
+    <group position={position}>
+      {/* Base escalonada de fundición */}
+      <mesh position={[0, 0.07, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.18, 0.22, 0.14, 14]} />
+        <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.38} />
+      </mesh>
+      <mesh position={[0, 0.36, 0]} castShadow>
+        <cylinderGeometry args={[0.1, 0.15, 0.46, 14]} />
+        <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.38} />
+      </mesh>
+      {/* Anillo inferior */}
+      <mesh position={[0, 0.61, 0]}>
+        <cylinderGeometry args={[0.12, 0.12, 0.05, 14]} />
+        <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.35} />
+      </mesh>
+
+      {/* Sección intermedia de madera cálida */}
+      <mesh position={[0, 1.06, 0]} castShadow>
+        <cylinderGeometry args={[0.085, 0.095, 0.86, 14]} />
+        <meshStandardMaterial map={oakTex} roughness={0.62} />
+      </mesh>
+
+      {/* Collarín de transición */}
+      <mesh position={[0, 1.51, 0]}>
+        <cylinderGeometry args={[0.105, 0.105, 0.05, 14]} />
+        <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.35} />
+      </mesh>
+
+      {/* Fuste superior metálico */}
+      <mesh position={[0, 2.26, 0]} castShadow>
+        <cylinderGeometry args={[0.055, 0.078, 1.46, 12]} />
+        <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.35} />
+      </mesh>
+      {/* Capitel bajo el farol */}
+      <mesh position={[0, 3.02, 0]}>
+        <cylinderGeometry args={[0.11, 0.06, 0.1, 12]} />
+        <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.35} />
+      </mesh>
+
+      {/* Cabezal de farol */}
+      <LanternHead position={[0, 3.06, 0]} scale={1} />
+
+      {castLight && (
+        <pointLight position={[0, 3.35, 0]} intensity={3.2} distance={11} color="#fde68a" />
+      )}
+    </group>
+  );
+}
+
+/**
+ * 13_faroles_iluminacion_3d.jpg (centro)
+ * Farol de pared con ménsula de hierro, brazo de madera y farol colgante.
+ */
+export function WallBracketLantern({
+  position = [0, 0, 0],
+  rotation = [0, 0, 0],
+  castLight = true,
+}) {
+  const oakTex = useMemo(() => getWoodTexture('oak'), []);
+
+  return (
+    <group position={position} rotation={rotation}>
+      {/* Placa de fijación a la pared */}
+      <mesh position={[0, 0, 0.02]} castShadow>
+        <boxGeometry args={[0.14, 0.42, 0.04]} />
+        <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.35} />
+      </mesh>
+      {/* Brazo horizontal de madera */}
+      <mesh position={[0, 0.14, 0.24]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.036, 0.036, 0.44, 10]} />
+        <meshStandardMaterial map={oakTex} roughness={0.62} />
+      </mesh>
+      {/* Puntera metálica del brazo */}
+      <mesh position={[0, 0.14, 0.47]}>
+        <boxGeometry args={[0.08, 0.08, 0.06]} />
+        <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.35} />
+      </mesh>
+      {/* Tornapunta curva inferior de hierro */}
+      <mesh position={[0, -0.02, 0.2]} rotation={[0.7, 0, 0]} castShadow>
+        <boxGeometry args={[0.035, 0.34, 0.035]} />
+        <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.35} />
+      </mesh>
+
+      {/* Farol colgante (invertido respecto al remate superior) */}
+      <LanternHead position={[0, -0.45, 0.44]} scale={0.78} />
+
+      {castLight && (
+        <pointLight position={[0, -0.25, 0.5]} intensity={2.4} distance={8.5} color="#fde68a" />
+      )}
+    </group>
+  );
+}
+
+/**
+ * 13_faroles_iluminacion_3d.jpg (derecha)
+ * Luminaria lineal colgante prismática con tubo LED cálido para andén cubierto.
+ */
+export function SuspendedLinearLamp({
+  position = [0, 0, 0],
+  rotation = [0, 0, 0],
+  drop = 0.65,
+  castLight = true,
+}) {
+  const length = 1.65;
+
+  return (
+    <group position={position} rotation={rotation}>
+      {/* Dos varillas de suspensión y rosetones */}
+      {[-0.58, 0.58].map((lx) => (
+        <group key={lx} position={[lx, 0, 0]}>
+          <mesh position={[0, drop, 0]}>
+            <boxGeometry args={[0.07, 0.025, 0.07]} />
+            <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.35} />
+          </mesh>
+          <mesh position={[0, drop / 2 + 0.06, 0]}>
+            <cylinderGeometry args={[0.012, 0.012, drop, 8]} />
+            <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.35} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Cuerpo prismático trapezoidal de vidrio */}
+      <mesh position={[0, 0, 0]} rotation={[0, Math.PI / 4, Math.PI / 2]}>
+        <cylinderGeometry args={[0.16, 0.16, length, 4]} />
+        <meshStandardMaterial
+          color="#e2e8f0"
+          transparent
+          opacity={0.35}
+          roughness={0.12}
+          metalness={0.2}
+        />
+      </mesh>
+
+      {/* Marcos metálicos en extremos y flejes intermedios */}
+      {[-length / 2, -0.28, 0.28, length / 2].map((fx, i) => (
+        <mesh key={i} position={[fx, 0, 0]} rotation={[0, Math.PI / 4, Math.PI / 2]}>
+          <cylinderGeometry args={[0.175, 0.175, 0.032, 4]} />
+          <meshStandardMaterial color="#1d2127" metalness={0.75} roughness={0.35} />
+        </mesh>
+      ))}
+
+      {/* Tubo lineal cálido interior */}
+      <mesh position={[0, -0.02, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.028, 0.028, length - 0.08, 10]} />
+        <meshStandardMaterial
+          color="#fef9c3"
+          emissive="#fde68a"
+          emissiveIntensity={2.4}
+        />
+      </mesh>
+
+      {castLight && (
+        <pointLight position={[0, -0.15, 0]} intensity={2.4} distance={9.5} color="#fde68a" />
+      )}
     </group>
   );
 }

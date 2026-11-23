@@ -14,10 +14,10 @@ export default function StationCanvas() {
       camera={{ position: [16, 11, 18], fov: 45 }}
       className="scene-canvas"
     >
-      <color attach="background" args={['#0f172a']} />
-      <fog attach="fog" args={['#0f172a', 38, 95]} />
+      <color attach="background" args={['#162033']} />
+      <fog attach="fog" args={['#162033', 42, 100]} />
 
-      <hemisphereLight args={['#bae6fd', '#1e293b', 0.65]} />
+      <hemisphereLight args={['#bae6fd', '#334155', 0.85]} />
       <directionalLight
         position={[18, 26, 14]}
         intensity={1.35}
@@ -31,6 +31,8 @@ export default function StationCanvas() {
         shadow-camera-top={22}
         shadow-camera-bottom={-22}
       />
+      {/* Luz de relleno frontal para iluminar la fachada y el fondo de la estación */}
+      <directionalLight position={[-16, 14, -10]} intensity={0.65} color="#dbeafe" />
 
       <StationEnvironment />
       <Train />
