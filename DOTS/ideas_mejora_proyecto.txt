@@ -1,0 +1,31 @@
+IDEAS PARA MEJORAR EL PROYECTO - ESTACION TRIVIA 3D
+====================================================
+
+1. JUGABILIDAD Y PROGRESION
+---------------------------
+- Niveles de dificultad en la trivia: preguntas Faciles, Medias y Dificiles con distintas recompensas en monedas.
+- Modos de juego adicionales: Modo Contrarreloj (responder la mayor cantidad de preguntas en 60s) o Modo Tematico (elegir categoria antes de que llegue el tren).
+- Misiones diarias y logros: por ejemplo "Responde 5 seguidas en Ferrocarriles", "Desbloquea 3 locales" o "Compra tu primer tren", otorgando bonificaciones de monedas.
+- Beneficios jugables por cada mejora y tren: por ejemplo, la Cafeteria y la Floreria podrian generar ingresos pasivos de monedas por cada tren que llega, y los Molinetes aumentar la cantidad de pasajeros que bajan y suben.
+- Pasajeros con animacion completa: que los pasajeros caminen desde los molinetes hacia el anden, esperen en los bancos instalados y suban al tren cuando llega.
+
+2. ESCENA 3D, TRENES Y VIAS
+---------------------------
+- Ciclo dia / atardecer / noche dinamico: que las farolas, tiras LED de la cubierta, vitrinas de locales y faros del tren resalten automaticamente al caer la noche.
+- Mas infraestructura ferroviaria: agregar un desvio/cambio de via funcional (como en 06_cambio_via_y_catenaria_3d.jpg), senales luminosas ferroviarias (rojo/amarillo/verde) que cambien segun la fase del tren y barreras en un paso a nivel cercano.
+- Apertura animada de puertas del tren: cuando el tren frena en el anden durante la trivia, animar la apertura de puertas y desplegar un pequeno cartel en el anden.
+- Efectos de sonido y musica ambiental (Web Audio API): sonido de frenos y bocina al llegar, timbre de estacion antes de la pregunta, sonido de monedas al acertar y musica suave opcional con boton de silencio en el HUD.
+- Camaras predefinidas: botones rapidos en el HUD para alternar vistas ("Vista General", "Anden y Locales", "Cabina del Tren") ademas de la camara orbital libre.
+
+3. INTERFAZ Y EXPERIENCIA DE USUARIO (UI/UX)
+--------------------------------------------
+- Vista previa 3D o miniatura en los modales de "Mejorar Estacion" y "Elegir Tren".
+- Panel de estadisticas detalladas: precision por categoria, historial de rachas, total de trenes recibidos y progreso de coleccion (ej. "8/12 mejoras desbloqueadas").
+- Atajos de teclado en la trivia: teclas 1, 2, 3, 4 para seleccionar opciones rapidamente y Enter/Espacio para llamar al tren.
+- Diseno responsivo mejorado para pantallas moviles y tablets.
+
+4. BACKEND, DATOS Y RENDIMIENTO
+-------------------------------
+- Soporte multi-perfil o partidas guardadas (slots) en el servidor o base de datos SQLite en lugar de un unico archivo db.json.
+- Banco de preguntas editable desde un panel o importable por JSON/CSV, con explicacion breve ("Sabias que...") luego de responder cada pregunta.
+- Optimizacion del bundle 3D (code-splitting con React.lazy y manualChunks en Vite) para reducir el tiempo de carga inicial.
