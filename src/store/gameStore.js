@@ -1,4 +1,10 @@
 import { create } from 'zustand';
+import {
+  playClickSound,
+  playCoinSound,
+  playErrorSound,
+  playStationBell,
+} from '../utils/sound.js';
 
 const BASE_WAIT_MS = 30_000;
 const EXPRESS_WAIT_MS = 20_000;
@@ -22,6 +28,8 @@ export const useGameStore = create((set, get) => ({
   unlockedTrains: ['sarmiento'],
   selectedTrain: 'sarmiento',
   trainsCatalog: [],
+  achievements: [],
+  passiveIncomePerTrain: 0,
   serverOnline: true,
 
   // Trivia actual
@@ -30,13 +38,18 @@ export const useGameStore = create((set, get) => ({
   selectedIndex: null,
   lastResult: null,
   isSubmitting: false,
+  difficulty: 'Todas',
 
   // Señal de oleada de pasajeros al responder bien
   passengerWave: { id: 0, count: 0 },
 
-  // UI
+  // UI y Ambiente
   shopOpen: false,
   trainShopOpen: false,
+  statsOpen: false,
+  timeOfDay: 'night',
+  cameraPreset: 'overview',
+  muted: false,
   toast: null,
 
   getWaitDurationMs: () => {
@@ -50,9 +63,23 @@ export const useGameStore = create((set, get) => ({
 
   clearToast: () => set({ toast: null }),
 
-  setShopOpen: (shopOpen) => set({ shopOpen, trainShopOpen: false }),
+  setShopOpen: (shopOpen) => set({ shopOpen, trainShopOpen: false, statsOpen: false }),
 
-  setTrainShopOpen: (trainShopOpen) => set({ trainShopOpen, shopOpen: false }),
+  setTrainShopOpen: (trainShopOpen) => set({ trainShopOpen, shopOpen: false, statsOpen: false }),
+
+  setStatsOpen: (statsOpen) => set({ statsOpen, shopOpen: false, trainShopOpen: false }),
+
+  setDifficulty: (difficulty) => set({ difficulty }),
+
+  cycleTimeOfDay: () => {
+    const order = ['night', 'day', 'sunset'];
+    const next = order[(order.indexOf(get().timeOfDay) + 1) % order.length];
+    set({ timeOfDay: next });
+  },
+
+  setCameraPreset: (cameraPreset) => set({ cameraPreset }),
+
+  toggleMuted: () => set((s) => ({ muted: !s.muted })),
 
   fetchStation: async () => {
     try {
@@ -70,6 +97,8 @@ export const useGameStore = create((set, get) => ({
         unlockedTrains: data.unlockedTrains || ['sarmiento'],
         selectedTrain: data.selectedTrain || 'sarmiento',
         trainsCatalog: data.trainsCatalog || [],
+        achievements: data.achievements || [],
+        passiveIncomePerTrain: data.passiveIncomePerTrain || 0,
         serverOnline: true,
       });
     } catch {
@@ -96,8 +125,10 @@ export const useGameStore = create((set, get) => ({
   },
 
   onTrainArrived: async () => {
-    const { phase, lastQuestionId } = get();
+    const { phase, lastQuestionId, difficulty, muted } = get();
     if (phase !== 'ARRIVING') return;
+
+    playStationBell(muted);
 
     set({
       phase: 'TRIVIA',
@@ -107,8 +138,11 @@ export const useGameStore = create((set, get) => ({
     });
 
     try {
-      const query = lastQuestionId ? `?lastId=${encodeURIComponent(lastQuestionId)}` : '';
-      const res = await fetch(`/api/trivia/next${query}`);
+      const params = new URLSearchParams();
+      if (lastQuestionId) params.set('lastId', lastQuestionId);
+      if (difficulty && difficulty !== 'Todas') params.set('difficulty', difficulty);
+      const qs = params.toString();
+      const res = await fetch(`/api/trivia/next${qs ? `?${qs}` : ''}`);
       if (!res.ok) throw new Error('No se pudo cargar la pregunta');
       const question = await res.json();
       set({
@@ -124,7 +158,7 @@ export const useGameStore = create((set, get) => ({
   },
 
   submitAnswer: async (selectedIndex) => {
-    const { phase, activeQuestion, isSubmitting } = get();
+    const { phase, activeQuestion, isSubmitting, muted } = get();
     if (phase !== 'TRIVIA' || !activeQuestion || isSubmitting) return;
 
     set({ isSubmitting: true, selectedIndex, triviaEndsAt: null });
@@ -141,6 +175,17 @@ export const useGameStore = create((set, get) => ({
       if (!res.ok) throw new Error('Error al validar respuesta');
       const data = await res.json();
 
+      if (data.correct) {
+        playCoinSound(muted);
+      } else {
+        playErrorSound(muted);
+      }
+
+      if (data.newAchievements?.length) {
+        const first = data.newAchievements[0];
+        get().showToast(`🏆 ¡Logro desbloqueado: ${first.name} (+${first.reward} 🪙)!`, 'success');
+      }
+
       const nextWave = data.correct
         ? { id: Date.now(), count: Math.floor(Math.random() * 3) + 3 } // 3 a 5 pasajeros
         : get().passengerWave;
@@ -155,12 +200,17 @@ export const useGameStore = create((set, get) => ({
         totalCorrect: data.totalCorrect,
         upgrades: data.upgrades,
         catalog: data.catalog,
+        achievements: data.achievements || [],
+        passiveIncomePerTrain: data.passiveIncomePerTrain || 0,
         passengerWave: nextWave,
         lastResult: {
           correct: data.correct,
           correctIndex: data.correctIndex,
+          difficulty: data.difficulty,
+          explanation: data.explanation,
           baseCoins: data.baseCoins,
           streakBonus: data.streakBonus,
+          passiveIncome: data.passiveIncome || 0,
           totalEarned: data.totalEarned,
           timedOut: selectedIndex === -1,
         },
@@ -203,7 +253,10 @@ export const useGameStore = create((set, get) => ({
         coins: data.coins,
         upgrades: data.upgrades,
         catalog: data.catalog,
+        achievements: data.achievements || get().achievements,
+        passiveIncomePerTrain: data.passiveIncomePerTrain ?? get().passiveIncomePerTrain,
       });
+      playClickSound(get().muted);
       get().showToast(`¡Mejora desbloqueada: ${data.purchased.name}!`, 'success');
     } catch {
       get().showToast('Error de conexión al comprar mejora', 'error');
@@ -228,7 +281,9 @@ export const useGameStore = create((set, get) => ({
         unlockedTrains: data.unlockedTrains,
         selectedTrain: data.selectedTrain,
         trainsCatalog: data.trainsCatalog,
+        achievements: data.achievements || get().achievements,
       });
+      playClickSound(get().muted);
       if (data.purchased) {
         get().showToast(`¡Tren adquirido y en servicio: ${data.purchased.name}!`, 'success');
       } else {
@@ -255,8 +310,11 @@ export const useGameStore = create((set, get) => ({
         unlockedTrains: data.unlockedTrains || ['sarmiento'],
         selectedTrain: data.selectedTrain || 'sarmiento',
         trainsCatalog: data.trainsCatalog || [],
+        achievements: data.achievements || [],
+        passiveIncomePerTrain: data.passiveIncomePerTrain || 0,
         shopOpen: false,
         trainShopOpen: false,
+        statsOpen: false,
       });
       get().showToast('Estación reiniciada desde cero', 'success');
     } catch {

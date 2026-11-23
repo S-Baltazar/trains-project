@@ -135,6 +135,85 @@ const TRAIN_CATALOG = [
   },
 ];
 
+const PASSIVE_INCOME_MAP = {
+  ticket_kiosk: 5,
+  totem_screens: 6,
+  turnstiles: 8,
+  cafe: 12,
+  bookstore: 14,
+  flower_shop: 16,
+};
+
+const ACHIEVEMENT_DEFS = [
+  {
+    id: 'first_correct',
+    name: 'Primer Boleto',
+    description: 'Responde correctamente tu primera pregunta.',
+    reward: 25,
+    icon: '🎟️',
+    check: (s) => s.totalCorrect >= 1,
+  },
+  {
+    id: 'streak_3',
+    name: 'En Racha',
+    description: 'Consigue una racha de 3 respuestas correctas seguidas.',
+    reward: 40,
+    icon: '🔥',
+    check: (s) => s.bestStreak >= 3,
+  },
+  {
+    id: 'streak_5',
+    name: 'Maquinista Experto',
+    description: 'Alcanza una racha de 5 respuestas correctas seguidas.',
+    reward: 75,
+    icon: '🏆',
+    check: (s) => s.bestStreak >= 5,
+  },
+  {
+    id: 'upgrades_3',
+    name: 'Arquitecto Ferroviario',
+    description: 'Desbloquea 3 mejoras en la estación.',
+    reward: 50,
+    icon: '🏗️',
+    check: (s) => (s.upgrades?.length || 0) >= 3,
+  },
+  {
+    id: 'trains_2',
+    name: 'Coleccionista de Flota',
+    description: 'Compra al menos 1 tren adicional.',
+    reward: 60,
+    icon: '🚆',
+    check: (s) => (s.unlockedTrains?.length || 1) >= 2,
+  },
+  {
+    id: 'upgrades_all',
+    name: 'Estación Modelo',
+    description: 'Desbloquea todas las mejoras disponibles de la estación.',
+    reward: 150,
+    icon: '🌟',
+    check: (s) => (s.upgrades?.length || 0) >= UPGRADE_CATALOG.length,
+  },
+];
+
+function computePassiveIncome(upgrades = []) {
+  return upgrades.reduce((sum, id) => sum + (PASSIVE_INCOME_MAP[id] || 0), 0);
+}
+
+function evaluateAchievements(state) {
+  if (!Array.isArray(state.unlockedAchievements)) {
+    state.unlockedAchievements = [];
+  }
+  const newlyUnlocked = [];
+  for (const ach of ACHIEVEMENT_DEFS) {
+    if (!state.unlockedAchievements.includes(ach.id) && ach.check(state)) {
+      state.unlockedAchievements.push(ach.id);
+      state.coins += ach.reward;
+      newlyUnlocked.push({ id: ach.id, name: ach.name, reward: ach.reward, icon: ach.icon });
+    }
+  }
+  return newlyUnlocked;
+}
+
 const DEFAULT_STATE = {
   coins: 25,
   streak: 0,
@@ -144,6 +223,7 @@ const DEFAULT_STATE = {
   upgrades: [],
   unlockedTrains: ['sarmiento'],
   selectedTrain: 'sarmiento',
+  unlockedAchievements: [],
 };
 
 function loadQuestions() {
@@ -171,6 +251,7 @@ function saveState(state) {
 function buildStationPayload(state) {
   const unlockedTrains = state.unlockedTrains || ['sarmiento'];
   const selectedTrain = state.selectedTrain || 'sarmiento';
+  const unlockedAchievements = state.unlockedAchievements || [];
 
   return {
     coins: state.coins,
@@ -179,8 +260,10 @@ function buildStationPayload(state) {
     totalAnswered: state.totalAnswered,
     totalCorrect: state.totalCorrect,
     upgrades: state.upgrades,
+    passiveIncomePerTrain: computePassiveIncome(state.upgrades),
     catalog: UPGRADE_CATALOG.map((item) => ({
       ...item,
+      passiveIncome: PASSIVE_INCOME_MAP[item.id] || 0,
       unlocked: state.upgrades.includes(item.id),
     })),
     unlockedTrains,
@@ -189,6 +272,14 @@ function buildStationPayload(state) {
       ...train,
       unlocked: unlockedTrains.includes(train.id),
       selected: selectedTrain === train.id,
+    })),
+    achievements: ACHIEVEMENT_DEFS.map(({ id, name, description, reward, icon }) => ({
+      id,
+      name,
+      description,
+      reward,
+      icon,
+      unlocked: unlockedAchievements.includes(id),
     })),
   };
 }
@@ -221,17 +312,27 @@ function rememberQuestionId(id) {
 }
 
 app.get('/api/trivia/next', (req, res) => {
-  const questions = loadQuestions();
+  const questions = loadQuestions().map((q) => ({
+    ...q,
+    difficulty: q.difficulty || 'Media',
+    explanation:
+      q.explanation || `La respuesta correcta es "${q.options[q.correctIndex]}".`,
+  }));
   const lastId = req.query.lastId;
+  const difficulty = req.query.difficulty || 'Todas';
+
   const freshCurated = questions.filter(
-    (q) => q.id !== lastId && !recentQuestionIds.includes(q.id)
+    (q) =>
+      q.id !== lastId &&
+      !recentQuestionIds.includes(q.id) &&
+      (difficulty === 'Todas' || q.difficulty === difficulty)
   );
 
   let picked;
   // Mezcla preguntas curadas no vistas recientemente y preguntas procedurales únicas
   const useProcedural = freshCurated.length === 0 || Math.random() < 0.45;
   if (useProcedural) {
-    picked = generateProceduralQuestion();
+    picked = generateProceduralQuestion(difficulty);
     generatedQuestionsCache.set(picked.id, picked);
     if (generatedQuestionsCache.size > 150) {
       const oldestKey = generatedQuestionsCache.keys().next().value;
@@ -247,6 +348,7 @@ app.get('/api/trivia/next', (req, res) => {
   res.json({
     id: picked.id,
     category: picked.category,
+    difficulty: picked.difficulty,
     question: picked.question,
     options: picked.options,
   });
@@ -255,20 +357,26 @@ app.get('/api/trivia/next', (req, res) => {
 app.post('/api/trivia/answer', (req, res) => {
   const { questionId, selectedIndex } = req.body ?? {};
   const questions = loadQuestions();
-  const question =
+  const rawQuestion =
     questions.find((q) => q.id === questionId) || generatedQuestionsCache.get(questionId);
 
-  if (!question) {
+  if (!rawQuestion) {
     return res.status(404).json({ error: 'Pregunta no encontrada' });
   }
 
+  const difficulty = rawQuestion.difficulty || 'Media';
+  const explanation =
+    rawQuestion.explanation ||
+    `La respuesta correcta es "${rawQuestion.options[rawQuestion.correctIndex]}".`;
+
   const state = loadState();
-  const isCorrect = Number(selectedIndex) === question.correctIndex;
+  const isCorrect = Number(selectedIndex) === rawQuestion.correctIndex;
   state.totalAnswered += 1;
 
   let baseCoins = 0;
   let streakBonus = 0;
-  let totalEarned = 0;
+  const passiveIncome = computePassiveIncome(state.upgrades);
+  let totalEarned = passiveIncome;
 
   if (isCorrect) {
     state.totalCorrect += 1;
@@ -276,22 +384,33 @@ app.post('/api/trivia/answer', (req, res) => {
     if (state.streak > state.bestStreak) {
       state.bestStreak = state.streak;
     }
-    baseCoins = Math.floor(Math.random() * 41) + 10; // 10 a 50 monedas aleatorias
+    const ranges = {
+      Fácil: [15, 30],
+      Media: [30, 55],
+      Difícil: [55, 90],
+    };
+    const [minC, maxC] = ranges[difficulty] || ranges.Media;
+    baseCoins = Math.floor(Math.random() * (maxC - minC + 1)) + minC;
     streakBonus = Math.min(state.streak - 1, 10) * 5; // +5 por racha consecutiva
-    totalEarned = baseCoins + streakBonus;
-    state.coins += totalEarned;
+    totalEarned += baseCoins + streakBonus;
   } else {
     state.streak = 0;
   }
 
+  state.coins += totalEarned;
+  const newAchievements = evaluateAchievements(state);
   saveState(state);
 
   res.json({
     correct: isCorrect,
-    correctIndex: question.correctIndex,
+    correctIndex: rawQuestion.correctIndex,
+    difficulty,
+    explanation,
     baseCoins,
     streakBonus,
+    passiveIncome,
     totalEarned,
+    newAchievements,
     ...buildStationPayload(state),
   });
 });
@@ -315,10 +434,12 @@ app.post('/api/station/upgrade', (req, res) => {
 
   state.coins -= item.cost;
   state.upgrades.push(upgradeId);
+  const newAchievements = evaluateAchievements(state);
   saveState(state);
 
   res.json({
     purchased: item,
+    newAchievements,
     ...buildStationPayload(state),
   });
 });
@@ -347,11 +468,13 @@ app.post('/api/station/train', (req, res) => {
   }
 
   state.selectedTrain = trainId;
+  const newAchievements = evaluateAchievements(state);
   saveState(state);
 
   res.json({
     purchased,
     selected: train,
+    newAchievements,
     ...buildStationPayload(state),
   });
 });

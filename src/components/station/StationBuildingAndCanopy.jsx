@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useGameStore } from '../../store/gameStore.js';
 import {
   getBallastTexture,
   getBrickTexture,
@@ -141,6 +142,41 @@ function BrickArchBay({ zCenter, brickTex }) {
   );
 }
 
+function RailwaySignal({ position }) {
+  const phase = useGameStore((s) => s.phase);
+  const isGreen = phase === 'TRIVIA' || phase === 'RESULT';
+  const isYellow = phase === 'ARRIVING' || phase === 'DEPARTING';
+  const isRed = phase === 'WAITING';
+
+  return (
+    <group position={position}>
+      <mesh position={[0, 1.85, 0]} castShadow>
+        <cylinderGeometry args={[0.07, 0.09, 3.7, 10]} />
+        <meshStandardMaterial color="#1e2228" metalness={0.7} roughness={0.35} />
+      </mesh>
+      <mesh position={[0, 3.65, 0]} castShadow>
+        <boxGeometry args={[0.34, 0.96, 0.24]} />
+        <meshStandardMaterial color="#181b20" metalness={0.6} roughness={0.4} />
+      </mesh>
+      {/* Luz Roja / Amarilla / Verde */}
+      {[
+        { y: 3.92, active: isRed, color: '#ef4444' },
+        { y: 3.65, active: isYellow, color: '#facc15' },
+        { y: 3.38, active: isGreen, color: '#22c55e' },
+      ].map((sig, i) => (
+        <mesh key={i} position={[0, sig.y, 0.13]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.085, 0.085, 0.04, 14]} />
+          <meshStandardMaterial
+            color={sig.active ? sig.color : '#1e293b'}
+            emissive={sig.active ? sig.color : '#000000'}
+            emissiveIntensity={sig.active ? 2.4 : 0}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 export default function StationBuildingAndCanopy() {
   const brickTex = useMemo(() => getBrickTexture(), []);
   const concreteTex = useMemo(() => getConcreteSlabTexture(), []);
@@ -249,6 +285,27 @@ export default function StationBuildingAndCanopy() {
         <boxGeometry args={[0.025, 0.025, 140]} />
         <meshStandardMaterial color="#475569" metalness={0.8} roughness={0.3} />
       </mesh>
+
+      {/* Señal luminosa ferroviaria reactiva a la fase del tren */}
+      <RailwaySignal position={[-2.15, 0, 14.5]} />
+
+      {/* Desvío / cambio de vía decorativo (06_cambio_via_y_catenaria_3d.jpg) */}
+      <group position={[0, 0, -24]}>
+        {[-1.0, 1.0].map((rx, i) => (
+          <mesh key={`sw-${i}`} position={[rx - 1.15, 0.23, -3.5]} rotation={[0, -0.24, 0]}>
+            <boxGeometry args={[0.1, 0.11, 10]} />
+            <meshStandardMaterial color="#cbd5e1" metalness={0.82} roughness={0.25} />
+          </mesh>
+        ))}
+        <mesh position={[-1.95, 0.22, 0]} castShadow>
+          <boxGeometry args={[0.32, 0.28, 0.44]} />
+          <meshStandardMaterial color="#1e2228" metalness={0.6} roughness={0.4} />
+        </mesh>
+        <mesh position={[-1.95, 0.48, 0]} rotation={[0, 0, 0.35]}>
+          <boxGeometry args={[0.05, 0.42, 0.05]} />
+          <meshStandardMaterial color="#facc15" roughness={0.4} />
+        </mesh>
+      </group>
 
       {/* ANDÉN PRINCIPAL (06_modulo_anden_3d.jpg: subestructura oscura + losa clara en voladizo) */}
       <mesh position={[5.8, 0.38, 0]} receiveShadow castShadow>

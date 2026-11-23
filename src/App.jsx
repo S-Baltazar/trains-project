@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import StationCanvas from './components/StationCanvas.jsx';
 import HUD from './components/HUD.jsx';
 import TriviaModal from './components/TriviaModal.jsx';
-import UpgradeShop from './components/UpgradeShop.jsx';
-import TrainShopModal from './components/TrainShopModal.jsx';
 import { useGameStore } from './store/gameStore.js';
 import './App.css';
+
+const UpgradeShop = lazy(() => import('./components/UpgradeShop.jsx'));
+const TrainShopModal = lazy(() => import('./components/TrainShopModal.jsx'));
+const StatsModal = lazy(() => import('./components/StatsModal.jsx'));
 
 export default function App() {
   const fetchStation = useGameStore((s) => s.fetchStation);
@@ -30,8 +32,11 @@ export default function App() {
       <StationCanvas />
       <HUD />
       <TriviaModal />
-      <UpgradeShop />
-      <TrainShopModal />
+      <Suspense fallback={null}>
+        <UpgradeShop />
+        <TrainShopModal />
+        <StatsModal />
+      </Suspense>
 
       {toast && (
         <div className={`toast ${toast.type}`}>

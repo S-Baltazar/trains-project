@@ -16,16 +16,18 @@ function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function buildQuestion(category, question, correctAnswer, distractors) {
+function buildQuestion(category, difficulty, question, correctAnswer, distractors, explanation) {
   const uniqueDistractors = [...new Set(distractors.filter((d) => d !== correctAnswer))];
   const picked = shuffle(uniqueDistractors).slice(0, 3);
   const options = shuffle([correctAnswer, ...picked]);
   return {
     id: `proc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
     category,
+    difficulty,
     question,
     options,
     correctIndex: options.indexOf(correctAnswer),
+    explanation,
   };
 }
 
@@ -109,9 +111,11 @@ function generateCapitalQuestion() {
   const allCapitals = CAPITALS.map(([, c]) => c);
   return buildQuestion(
     'Geografía',
+    'Fácil',
     `¿Cuál es la capital oficial de ${country}?`,
     capital,
-    allCapitals
+    allCapitals,
+    `${capital} es la capital oficial de ${country}.`
   );
 }
 
@@ -120,16 +124,20 @@ function generateElementQuestion() {
   if (Math.random() < 0.5) {
     return buildQuestion(
       'Ciencia',
+      'Media',
       `¿Cuál es el símbolo químico del elemento ${name}?`,
       symbol,
-      ELEMENTS.map(([, s]) => s)
+      ELEMENTS.map(([, s]) => s),
+      `El elemento ${name} se representa con el símbolo '${symbol}' en la tabla periódica.`
     );
   }
   return buildQuestion(
     'Ciencia',
+    'Media',
     `¿A qué elemento químico corresponde el símbolo '${symbol}'?`,
     name,
-    ELEMENTS.map(([n]) => n)
+    ELEMENTS.map(([n]) => n),
+    `El símbolo '${symbol}' corresponde al ${name}.`
   );
 }
 
@@ -149,9 +157,11 @@ function generateRailwayMathQuestion() {
     ];
     return buildQuestion(
       'Ferrocarriles',
+      'Media',
       `Si un tren circula a una velocidad constante de ${v} km/h, ¿qué distancia recorre en ${h} horas?`,
       `${dist} km`,
-      distractors
+      distractors,
+      `Distancia = velocidad × tiempo (${v} km/h × ${h} h = ${dist} km).`
     );
   }
 
@@ -163,9 +173,11 @@ function generateRailwayMathQuestion() {
   ];
   return buildQuestion(
     'Ferrocarriles',
+    'Difícil',
     `Un tren debe recorrer ${dist} km a una velocidad constante de ${v} km/h. ¿Cuántas horas tarda en completar el viaje?`,
     `${h} horas`,
-    distractors
+    distractors,
+    `Tiempo = distancia ÷ velocidad (${dist} km ÷ ${v} km/h = ${h} horas).`
   );
 }
 
@@ -181,9 +193,11 @@ function generatePassengerCapacityQuestion() {
   ];
   return buildQuestion(
     'Matemática Ferroviaria',
+    'Difícil',
     `Una formación tiene ${cars} coches y en cada coche viajan ${perCar} pasajeros. ¿Cuántos pasajeros lleva el tren en total?`,
     `${total}`,
-    distractors
+    distractors,
+    `${cars} coches × ${perCar} pasajeros = ${total} pasajeros en total.`
   );
 }
 
@@ -191,19 +205,27 @@ function generateInventionQuestion() {
   const [thing, person, others] = pickRandom(INVENTIONS);
   return buildQuestion(
     'Historia y Ciencia',
+    'Fácil',
     `¿Quién es reconocido por ${thing}?`,
     person,
-    others
+    others,
+    `${person} es reconocido históricamente por ${thing}.`
   );
 }
 
-export function generateProceduralQuestion() {
-  const generators = [
-    generateCapitalQuestion,
-    generateElementQuestion,
-    generateRailwayMathQuestion,
-    generatePassengerCapacityQuestion,
-    generateInventionQuestion,
-  ];
-  return pickRandom(generators)();
+export function generateProceduralQuestion(targetDifficulty = 'Todas') {
+  const byDiff = {
+    Fácil: [generateCapitalQuestion, generateInventionQuestion],
+    Media: [generateElementQuestion, generateRailwayMathQuestion],
+    Difícil: [generateRailwayMathQuestion, generatePassengerCapacityQuestion],
+  };
+  const pool =
+    byDiff[targetDifficulty] || [
+      generateCapitalQuestion,
+      generateElementQuestion,
+      generateRailwayMathQuestion,
+      generatePassengerCapacityQuestion,
+      generateInventionQuestion,
+    ];
+  return pickRandom(pool)();
 }

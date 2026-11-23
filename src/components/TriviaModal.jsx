@@ -24,6 +24,19 @@ export default function TriviaModal() {
     return () => clearInterval(id);
   }, [phase, triviaEndsAt]);
 
+  // Atajos de teclado 1-4 para responder rápidamente
+  useEffect(() => {
+    if (phase !== 'TRIVIA' || !activeQuestion || isSubmitting) return;
+    const onKeyDown = (e) => {
+      const idx = ['1', '2', '3', '4'].indexOf(e.key);
+      if (idx !== -1 && idx < activeQuestion.options.length) {
+        submitAnswer(idx);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [phase, activeQuestion, isSubmitting, submitAnswer]);
+
   if ((phase !== 'TRIVIA' && phase !== 'RESULT') || !activeQuestion) {
     return null;
   }
@@ -36,7 +49,9 @@ export default function TriviaModal() {
             <span className="captain-avatar">👨‍✈️</span>
             <div>
               <strong>Capitán del Tren</strong>
-              <span className="category-tag">{activeQuestion.category}</span>
+              <span className="category-tag">
+                {activeQuestion.category} • {activeQuestion.difficulty || 'Media'}
+              </span>
             </div>
           </div>
 
@@ -81,7 +96,8 @@ export default function TriviaModal() {
                 <strong>¡Respuesta correcta! +{lastResult.totalEarned} 🪙</strong>
                 <span>
                   ({lastResult.baseCoins} base
-                  {lastResult.streakBonus > 0 ? ` + ${lastResult.streakBonus} bono por racha` : ''})
+                  {lastResult.streakBonus > 0 ? ` + ${lastResult.streakBonus} racha` : ''}
+                  {lastResult.passiveIncome > 0 ? ` + ${lastResult.passiveIncome} locales` : ''})
                   — ¡Pasajeros bajando al andén!
                 </span>
               </>
@@ -89,9 +105,13 @@ export default function TriviaModal() {
               <>
                 <strong>
                   {lastResult.timedOut ? '¡Se acabó el tiempo!' : 'Respuesta incorrecta'}
+                  {lastResult.passiveIncome > 0 ? ` (+${lastResult.passiveIncome} 🪙 locales)` : ''}
                 </strong>
                 <span>La racha volvió a 0. ¡Prepárate para el próximo tren!</span>
               </>
+            )}
+            {lastResult.explanation && (
+              <span className="explanation-text">💡 {lastResult.explanation}</span>
             )}
           </div>
         )}

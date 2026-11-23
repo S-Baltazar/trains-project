@@ -520,3 +520,95 @@
     grid-template-columns: 1fr;
   }
 }
+
+.difficulty-row {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+}
+
+.diff-pill {
+  flex: 1;
+  padding: 0.28rem 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.diff-pill.active {
+  background: #38bdf8;
+  color: #0f172a;
+  border-color: #38bdf8;
+}
+
+.hud-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+}
+
+.btn-mini {
+  padding: 0.3rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.btn-mini.active {
+  border-color: #38bdf8;
+  color: #7dd3fc;
+}
+
+.explanation-text {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  color: #e2e8f0;
+  opacity: 0.92;
+}
+
+.stats-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.summary-box {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 0.9rem;
+  background: rgba(30, 41, 59, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+}
+
+.summary-box strong {
+  font-size: 1.15rem;
+  color: #f8fafc;
+}
+
+.summary-box span {
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.achievements-title {
+  margin: 0 0 0.65rem;
+  font-size: 1rem;
+  color: #f8fafc;
+}
+
+.locked-reward {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #94a3b8;
+}

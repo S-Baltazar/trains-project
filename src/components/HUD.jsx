@@ -9,21 +9,61 @@ const PHASE_LABELS = {
   DEPARTING: 'El tren está partiendo',
 };
 
+const TIME_LABELS = {
+  night: '🌙 Noche',
+  day: '☀️ Día',
+  sunset: '🌅 Tarde',
+};
+
+const CAMERA_PRESETS = [
+  { id: 'overview', label: '🎥 General' },
+  { id: 'platform', label: '🏪 Andén' },
+  { id: 'track', label: '🚆 Vía' },
+];
+
+const DIFFICULTIES = ['Todas', 'Fácil', 'Media', 'Difícil'];
+
 export default function HUD() {
   const phase = useGameStore((s) => s.phase);
   const waitEndsAt = useGameStore((s) => s.waitEndsAt);
   const coins = useGameStore((s) => s.coins);
   const streak = useGameStore((s) => s.streak);
   const bestStreak = useGameStore((s) => s.bestStreak);
+  const passiveIncomePerTrain = useGameStore((s) => s.passiveIncomePerTrain);
+  const difficulty = useGameStore((s) => s.difficulty);
+  const setDifficulty = useGameStore((s) => s.setDifficulty);
+  const timeOfDay = useGameStore((s) => s.timeOfDay);
+  const cycleTimeOfDay = useGameStore((s) => s.cycleTimeOfDay);
+  const cameraPreset = useGameStore((s) => s.cameraPreset);
+  const setCameraPreset = useGameStore((s) => s.setCameraPreset);
+  const muted = useGameStore((s) => s.muted);
+  const toggleMuted = useGameStore((s) => s.toggleMuted);
   const catalog = useGameStore((s) => s.catalog);
   const trainsCatalog = useGameStore((s) => s.trainsCatalog);
+  const achievements = useGameStore((s) => s.achievements);
   const serverOnline = useGameStore((s) => s.serverOnline);
   const summonTrainNow = useGameStore((s) => s.summonTrainNow);
   const setShopOpen = useGameStore((s) => s.setShopOpen);
   const setTrainShopOpen = useGameStore((s) => s.setTrainShopOpen);
+  const setStatsOpen = useGameStore((s) => s.setStatsOpen);
   const resetStation = useGameStore((s) => s.resetStation);
 
   const [secondsLeft, setSecondsLeft] = useState(30);
+
+  useEffect(() => {
+    if (phase !== 'WAITING') return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        const tag = document.activeElement?.tagName;
+        if (tag !== 'BUTTON' && tag !== 'INPUT') {
+          e.preventDefault();
+          summonTrainNow();
+        }
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [phase, summonTrainNow]);
 
   useEffect(() => {
     const update = () => {
@@ -38,6 +78,7 @@ export default function HUD() {
 
   const affordableCount = catalog.filter((u) => !u.unlocked && coins >= u.cost).length;
   const affordableTrainsCount = trainsCatalog.filter((t) => !t.unlocked && coins >= t.cost).length;
+  const unlockedAchCount = achievements.filter((a) => a.unlocked).length;
 
   const handleReset = () => {
     if (window.confirm('¿Reiniciar la estación y empezar de 0? Se perderán tus monedas, mejoras y trenes comprados.')) {
@@ -57,13 +98,25 @@ export default function HUD() {
           <div className="stat-pill coins">
             <span>🪙</span>
             <strong>{coins}</strong>
-            <small>Monedas</small>
+            <small>Monedas {passiveIncomePerTrain > 0 ? `(+${passiveIncomePerTrain}/tren)` : ''}</small>
           </div>
           <div className="stat-pill streak">
             <span>🔥</span>
             <strong>{streak}</strong>
             <small>Racha (Máx {bestStreak})</small>
           </div>
+        </div>
+
+        <div className="difficulty-row" title="Dificultad de la trivia">
+          {DIFFICULTIES.map((d) => (
+            <button
+              key={d}
+              className={`diff-pill ${difficulty === d ? 'active' : ''}`}
+              onClick={() => setDifficulty(d)}
+            >
+              {d}
+            </button>
+          ))}
         </div>
 
         <div className="phase-box">
@@ -78,10 +131,32 @@ export default function HUD() {
           )}
         </div>
 
-        <p className="controls-hint">Arrastra para rotar la cámara • Rueda para zoom</p>
+        <div className="hud-toolbar">
+          <button className="btn-mini" onClick={cycleTimeOfDay} title="Cambiar momento del día">
+            {TIME_LABELS[timeOfDay]}
+          </button>
+          {CAMERA_PRESETS.map((cam) => (
+            <button
+              key={cam.id}
+              className={`btn-mini ${cameraPreset === cam.id ? 'active' : ''}`}
+              onClick={() => setCameraPreset(cam.id)}
+            >
+              {cam.label}
+            </button>
+          ))}
+          <button className="btn-mini" onClick={toggleMuted} title="Silenciar o activar sonido">
+            {muted ? '🔇' : '🔊'}
+          </button>
+        </div>
+
+        <p className="controls-hint">Teclas 1-4 en trivia • Enter/Espacio para llamar tren</p>
       </header>
 
       <div className="hud-actions">
+        <button className="btn-shop" onClick={() => setStatsOpen(true)}>
+          🏆 Logros
+          <span className="badge">{unlockedAchCount}/{achievements.length || 6}</span>
+        </button>
         <button className="btn-shop" onClick={() => setTrainShopOpen(true)}>
           🚆 Elegir Tren
           {affordableTrainsCount > 0 && <span className="badge">{affordableTrainsCount}</span>}
