@@ -1,0 +1,175 @@
+[
+  {
+    "id": "q1",
+    "category": "Geografía",
+    "question": "¿Cuál es el río más largo de América del Sur?",
+    "options": ["Río Paraná", "Río Orinoco", "Río Amazonas", "Río Uruguay"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q2",
+    "category": "Historia",
+    "question": "¿En qué año llegó el ser humano a la Luna por primera vez?",
+    "options": ["1965", "1969", "1972", "1959"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q3",
+    "category": "Ciencia",
+    "question": "¿Cuál es el símbolo químico del oro en la tabla periódica?",
+    "options": ["Ag", "Gd", "Au", "Or"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q4",
+    "category": "Arte y Literatura",
+    "question": "¿Quién escribió la novela 'Cien años de soledad'?",
+    "options": ["Mario Vargas Llosa", "Julio Cortázar", "Gabriel García Márquez", "Jorge Luis Borges"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q5",
+    "category": "Ferrocarriles",
+    "question": "¿Qué país inauguró en 1964 el primer tren de alta velocidad comercial (Shinkansen)?",
+    "options": ["Francia", "Japón", "Alemania", "Reino Unido"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q6",
+    "category": "Astronomía",
+    "question": "¿Cuál es el planeta más grande del sistema solar?",
+    "options": ["Saturno", "Neptuno", "Júpiter", "Urano"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q7",
+    "category": "Geografía",
+    "question": "¿Cuál es la capital de Australia?",
+    "options": ["Sídney", "Melbourne", "Canberra", "Perth"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q8",
+    "category": "Biología",
+    "question": "¿Cuántos corazones tiene un pulpo?",
+    "options": ["1", "2", "3", "4"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q9",
+    "category": "Historia",
+    "question": "¿Qué civilización antigua construyó la ciudadela de Machu Picchu?",
+    "options": ["Azteca", "Maya", "Inca", "Olmeca"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q10",
+    "category": "Física",
+    "question": "¿Aproximadamente a qué velocidad viaja la luz en el vacío?",
+    "options": ["300.000 km/s", "150.000 km/s", "30.000 km/s", "1.000.000 km/s"],
+    "correctIndex": 0
+  },
+  {
+    "id": "q11",
+    "category": "Arte",
+    "question": "¿Quién pintó 'La noche estrellada' en 1889?",
+    "options": ["Claude Monet", "Pablo Picasso", "Vincent van Gogh", "Salvador Dalí"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q12",
+    "category": "Tecnología",
+    "question": "¿Qué significan las siglas HTTP en la web?",
+    "options": [
+      "HyperText Transfer Protocol",
+      "High Transmission Text Process",
+      "Hyperlink Terminal Transport Path",
+      "Home Tool Transfer Protocol"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": "q13",
+    "category": "Geografía",
+    "question": "¿Cuál es el océano más grande de la Tierra?",
+    "options": ["Océano Atlántico", "Océano Índico", "Océano Pacífico", "Océano Ártico"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q14",
+    "category": "Música",
+    "question": "¿Cuántas cuerdas tiene normalmente una guitarra clásica?",
+    "options": ["4", "5", "6", "8"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q15",
+    "category": "Ciencia",
+    "question": "¿Qué gas es el más abundante en la atmósfera terrestre?",
+    "options": ["Oxígeno", "Dióxido de carbono", "Nitrógeno", "Argón"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q16",
+    "category": "Historia",
+    "question": "¿En qué ciudad se encontraba el famoso Faro antiguo considerado una de las Siete Maravillas?",
+    "options": ["Atenas", "Alejandría", "Roma", "Cartago"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q17",
+    "category": "Deportes",
+    "question": "¿Cada cuántos años se celebran los Juegos Olímpicos de Verano?",
+    "options": ["Cada 2 años", "Cada 3 años", "Cada 4 años", "Cada 5 años"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q18",
+    "category": "Matemáticas",
+    "question": "¿Cuál es el único número primo que es par?",
+    "options": ["0", "2", "4", "6"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q19",
+    "category": "Literatura",
+    "question": "¿Quién escribió 'Don Quijote de la Mancha'?",
+    "options": ["Lope de Vega", "Miguel de Cervantes", "Francisco de Quevedo", "Calderón de la Barca"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q20",
+    "category": "Ferrocarriles",
+    "question": "¿Qué fuente de energía impulsaba las primeras locomotoras de vapor del siglo XIX?",
+    "options": ["Electricidad", "Diésel", "Carbón y agua", "Gas natural"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q21",
+    "category": "Geografía",
+    "question": "¿En qué continente se encuentra el desierto del Sahara?",
+    "options": ["Asia", "África", "América", "Oceanía"],
+    "correctIndex": 1
+  },
+  {
+    "id": "q22",
+    "category": "Química",
+    "question": "¿Cuál es el elemento químico más ligero de la tabla periódica?",
+    "options": ["Helio", "Litio", "Hidrógeno", "Oxígeno"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q23",
+    "category": "Cine",
+    "question": "¿Qué película animada de Pixar trata sobre emociones dentro de la mente de una niña?",
+    "options": ["Coco", "Soul", "Intensa-Mente", "Up"],
+    "correctIndex": 2
+  },
+  {
+    "id": "q24",
+    "category": "Naturaleza",
+    "question": "¿Cuál es el mamífero terrestre más rápido del mundo?",
+    "options": ["León", "Guepardo", "Antílope", "Caballo"],
+    "correctIndex": 1
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "coins": 914,
+  "streak": 5,
+  "bestStreak": 18,
+  "totalAnswered": 49,
+  "totalCorrect": 40,
+  "upgrades": [
+    "benches",
+    "lamps",
+    "ticket_kiosk",
+    "cafe",
+    "express_train",
+    "clock_tower",
+    "bench_curved",
+    "bench_double",
+    "totem_screens"
+  ]
+}
