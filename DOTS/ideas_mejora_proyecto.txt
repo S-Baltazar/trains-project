@@ -1,28 +1,22 @@
 NUEVAS IDEAS DE PROGRESO Y EXPANSION - ESTACION TRIVIA 3D
 ==========================================================
 
-1. EXPANSION DE INFRAESTRUCTURA Y LINEAS FERROVIARIAS
------------------------------------------------------
-- Segundo anden y doble via: desbloquear una via paralela con puente peatonal elevado o tunel subterraneo para que puedan operar dos trenes en simultaneo (ej. tren local y tren expreso).
-- Electrificacion progresiva: desbloquear la subestacion electrica para habilitar trenes de alta velocidad y reducir aun mas los intervalos entre servicios.
-- Zona exterior de la estacion: parada de colectivos/taxis, bicicletero cubierto, estacionamiento y plaza de acceso frente al hall.
-- Carteles dinamicos de destino y clima en los totems y pantallas de anden reflejando el proximo tren seleccionado por el jugador.
+1. VIDA Y ANIMACION EN LA ESTACION 3D
+-------------------------------------
+- Pasajeros con IA y rutas completas: pasajeros que cruzan el puente peatonal por los escalones, pasan por los molinetes, visitan la libreria/floreria/cafe y esperan en ambos andenes.
+- Colectivo / autobus urbano animado: un colectivo 3D que llega periodicamente a las paradas exteriores de la Estacion 1 y Estacion 2 para dejar y recoger pasajeros.
+- Apertura animada de puertas del tren al frenar en el anden y luces interiores de los coches encendidas de noche.
+- Cableado aereo real entre la subestacion electrica y los postes de catenaria de ambas vias.
 
-2. SISTEMA DE NIVELES DE ESTACION Y REPUTACION
-----------------------------------------------
-- Nivel de Estacion (Nivel 1 a 10): subir de nivel al acumular pasajeros atendidos y mejoras instaladas, pasando de "Apeadero Rural" a "Estacion Central Metropolitana".
-- Medidor de Satisfaccion de Pasajeros: influenciado por la cantidad de bancos, iluminacion, limpieza (cestos) y puntualidad; a mayor satisfaccion, mayor multiplicador de monedas por trivia.
-- Eventos especiales aleatorios ("Hora Pico", "Dia de Lluvia", "Tren Turistico"): modificadores temporales que traen mas pasajeros o recompensas dobles.
+2. NUEVOS MODOS DE JUEGO Y TRIVIA
+---------------------------------
+- Modo Contrarreloj (60 segundos): responder preguntas en rafaga con multiplicador creciente por combo mientras el tren espera.
+- Modo Campana / Ruta de Estaciones: recorrer un ramal completo (Once -> Caballito -> Flores -> Liniers -> Moreno) desbloqueando cada parada con trivias tematicas.
+- Duelo de Trenes / Eventos especiales: bonificaciones por atender simultaneamente el tren principal y el expreso de la Estacion 2.
 
-3. PASARELAS, PASAJEROS Y ANIMACIONES AVANZADAS
------------------------------------------------
-- Rutas reales de pasajeros con pathfinding simple: pasajeros que entran por los molinetes, compran en la libreria/floreria/cafe, se sientan en los bancos y abordan al abrirse las puertas del tren.
-- Apertura animada de puertas del tren y despliegue de estribos al frenar en el anden.
-- Efectos climaticos en 3D: lluvia ligera con reflejos en el anden, neblina matinal y hojas o particulas de luz.
-
-4. NUEVOS MODOS DE TRIVIA Y PROGRESION COMPETITIVA
---------------------------------------------------
-- Modo Contrarreloj (60 segundos): responder en rafaga mientras el tren espera con multiplicador creciente por combo.
-- Modo Campana / Ruta de Estaciones: recorrer un ramal completo (ej. Once -> Caballito -> Flores -> Liniers -> Moreno) desbloqueando cada parada con trivias tematicas.
-- Ranking / Tabla de records local o global con puntaje por racha, velocidad de respuesta y nivel de estacion.
-- Banco de preguntas comunitario o editor visual en la web para crear y probar mazos de preguntas personalizados.
+3. INTERFAZ, PERSONALIZACION Y DATOS
+------------------------------------
+- Personalizacion de colores y nombre de la estacion en carteles 3D y pantallas LED.
+- Tabla de records y estadisticas historicas por categoria y dificultad.
+- Editor visual de preguntas personalizadas e importacion/exportacion de mazos JSON.
+- Soporte completo para dispositivos moviles con controles tactiles adaptados.

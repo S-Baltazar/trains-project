@@ -131,6 +131,20 @@ const UPGRADE_CATALOG = [
     icon: '🪑',
   },
   {
+    id: 'station2_shops',
+    name: 'Estación 2: Locales y Molinetes',
+    description: 'Replica librería, florería, barra de café, cajeros y molinetes en los arcos del andén 2.',
+    cost: 210,
+    icon: '🏪',
+  },
+  {
+    id: 'station2_exterior',
+    name: 'Estación 2: Plaza Exterior y Parada',
+    description: 'Construye la plaza exterior oeste con parada de colectivo, bicicletero y canteros.',
+    cost: 160,
+    icon: '🌳',
+  },
+  {
     id: 'express_train',
     name: 'Tren Expreso',
     description: 'Moderniza la locomotora y reduce el tiempo de espera entre trenes a 20s.',
@@ -182,6 +196,8 @@ const PASSIVE_INCOME_MAP = {
   second_platform: 20,
   station2_canopy: 14,
   station2_furniture: 10,
+  station2_shops: 25,
+  station2_exterior: 12,
 };
 
 const STATION_LEVEL_TITLES = [

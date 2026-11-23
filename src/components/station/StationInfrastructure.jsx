@@ -3,12 +3,18 @@ import { useFrame } from '@react-three/fiber';
 import { useGameStore } from '../../store/gameStore.js';
 import { TrainFormation } from '../Train.jsx';
 import {
+  AtmKioskModule,
+  BookstoreNewsstand,
   ClassicLampPost,
   CurvedErgonomicBench,
   DepartureTotem,
+  DoubleSidedBench,
+  FlowerShopPavilion,
   HangingStationClock,
+  IslandCoffeeBar,
   SlattedLinearBench,
   SuspendedLinearLamp,
+  TurnstileGateSet,
   WallBracketLantern,
 } from './StationFurniture.jsx';
 import {
@@ -296,7 +302,7 @@ export function SecondPlatformAndBridge() {
  * Subestación eléctrica modular con listones de madera, rejillas realistas, techo con LED
  * y patio lateral cercado con transformador y aisladores cerámicos.
  */
-export function ElectricalSubstation({ position = [-14.2, 0, -9] }) {
+export function ElectricalSubstation({ position = [-24.0, 0, -10] }) {
   const oakTex = useMemo(() => getWoodTexture('oak'), []);
   const concreteTex = useMemo(() => getConcreteSlabTexture(), []);
   const ventTex = useMemo(() => getVentGrilleTexture(), []);
@@ -841,6 +847,49 @@ export function Station2Furniture() {
       {/* Tótem de partidas */}
       <DepartureTotem position={[-8.5, 0.9, -1.8]} />
       <DepartureTotem position={[-8.5, 0.9, 11.8]} />
+    </group>
+  );
+}
+
+/**
+ * ESTACIÓN 2: Locales comerciales y molinetes replicados en los arcos del andén 2.
+ */
+export function Station2Shops() {
+  const concreteTex = useMemo(() => getConcreteSlabTexture(), []);
+
+  return (
+    <group>
+      {/* Piso de conexión bajo los arcos de Estación 2 hacia el exterior oeste */}
+      <mesh position={[-12.35, 0.83, 0]} receiveShadow>
+        <boxGeometry args={[2.3, 0.14, 24]} />
+        <meshStandardMaterial map={concreteTex} color="#cbd5e1" roughness={0.8} />
+      </mesh>
+
+      {/* Molinetes, Cestos y Mapa en el arco central de Estación 2 */}
+      <TurnstileGateSet position={[-12.0, 0.9, 0.45]} rotation={[0, Math.PI / 2, 0]} />
+
+      {/* Librería y Revistero en el arco norte */}
+      <BookstoreNewsstand position={[-11.95, 0.9, -7.0]} rotation={[0, Math.PI / 2, 0]} />
+
+      {/* Florería Verde Metálica en el arco sur */}
+      <FlowerShopPavilion position={[-11.95, 0.9, 7.0]} rotation={[0, Math.PI / 2, 0]} />
+
+      {/* Cajeros, Café Isla y Bancos Doble Faz en el andén 2 */}
+      <AtmKioskModule position={[-9.7, 0.9, -11.5]} rotation={[0, Math.PI, 0]} />
+      <IslandCoffeeBar position={[-8.8, 0.9, 2.2]} rotation={[0, Math.PI, 0]} />
+      <DoubleSidedBench position={[-8.1, 0.9, -6.8]} />
+      <DoubleSidedBench position={[-8.1, 0.9, 6.8]} />
+    </group>
+  );
+}
+
+/**
+ * ESTACIÓN 2: Decoración exterior oeste (plaza, parada de colectivo, bicicletero y canteros).
+ */
+export function Station2ExteriorPlaza() {
+  return (
+    <group position={[-2.0, 0, 0]} rotation={[0, Math.PI, 0]}>
+      <ExteriorBusAndBikePlaza />
     </group>
   );
 }
