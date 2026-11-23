@@ -143,32 +143,38 @@ export function getTactileStripTexture() {
 }
 
 /**
- * Balasto de piedra partida para la vía.
+ * Balasto de piedra partida de granito gris para la vía (05_via_ferrea_recta_3d.jpg).
  */
 export function getBallastTexture() {
   return getCached('ballast', () => {
     const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 256;
+    canvas.width = 512;
+    canvas.height = 512;
     const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = '#4a4d52';
-    ctx.fillRect(0, 0, 256, 256);
+    ctx.fillStyle = '#5c6066';
+    ctx.fillRect(0, 0, 512, 512);
 
-    const tones = ['#64686e', '#383b40', '#73767b', '#2c2f33', '#5c5852'];
-    for (let i = 0; i < 950; i++) {
-      const x = (i * 53) % 256;
-      const y = (i * 97) % 256;
-      const w = 3 + (i % 5);
-      const h = 3 + ((i * 3) % 4);
+    const tones = ['#8b9098', '#464a50', '#a3a8b0', '#34373c', '#747880', '#b4b8bf'];
+    for (let i = 0; i < 4200; i++) {
+      const x = (i * 73 + (i % 19) * 11) % 512;
+      const y = (i * 131 + (i % 23) * 7) % 512;
+      const w = 4 + (i % 7);
+      const h = 3 + ((i * 5) % 6);
       ctx.fillStyle = tones[i % tones.length];
-      ctx.fillRect(x, y, w, h);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + w, y + (i % 3));
+      ctx.lineTo(x + w - 1, y + h);
+      ctx.lineTo(x + (i % 2), y + h - 1);
+      ctx.closePath();
+      ctx.fill();
     }
 
     const tex = new THREE.CanvasTexture(canvas);
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(2, 48);
+    tex.repeat.set(3, 72);
     tex.colorSpace = THREE.SRGBColorSpace;
     return tex;
   });

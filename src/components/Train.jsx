@@ -289,13 +289,292 @@ function PassengerCarBody({
 }
 
 /**
- * Modelo 3D del Tren Sarmiento (Trenes Argentinos) animado en useFrame.
+ * 01_tren_dos_pisos_3d.jpg - Coche Doble Piso TBA (blanco y celeste).
+ */
+function DoubleDeckerCar({ isCabCar, wheelRefs, wheelStartIdx, tbaTex }) {
+  return (
+    <group>
+      <Bogie z={3.8} wheelRefs={wheelRefs} wheelStartIdx={wheelStartIdx} />
+      <Bogie z={-3.8} wheelRefs={wheelRefs} wheelStartIdx={wheelStartIdx + 2} />
+
+      {/* Chasis oscuro */}
+      <mesh position={[0, 0.65, 0]} castShadow>
+        <boxGeometry args={[2.46, 0.3, 11.2]} />
+        <meshStandardMaterial color="#0f172a" roughness={0.55} />
+      </mesh>
+
+      {/* Cuerpo principal blanco */}
+      <mesh position={[0, 1.75, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2.44, 1.9, 11.2]} />
+        <meshStandardMaterial color="#f8fafc" roughness={0.35} />
+      </mesh>
+
+      {/* Franja celeste característica TBA */}
+      <mesh position={[0, 1.68, 0]}>
+        <boxGeometry args={[2.46, 0.42, 6.2]} />
+        <meshStandardMaterial color="#0ea5e9" roughness={0.35} />
+      </mesh>
+      {/* Franja azul marino inferior */}
+      <mesh position={[0, 0.92, 0]}>
+        <boxGeometry args={[2.46, 0.1, 11.21]} />
+        <meshStandardMaterial color="#1e3a8a" roughness={0.4} />
+      </mesh>
+
+      {/* Ventanas piso superior (5 por lado) */}
+      {[-2.2, -1.1, 0, 1.1, 2.2].map((wz, i) => (
+        <group key={`ddw-${i}`}>
+          <mesh position={[0, 2.26, wz]}>
+            <boxGeometry args={[2.47, 0.42, 0.85]} />
+            <meshStandardMaterial color="#1e293b" roughness={0.15} metalness={0.35} />
+          </mesh>
+          <mesh position={[0, 1.24, wz]}>
+            <boxGeometry args={[2.47, 0.44, 0.85]} />
+            <meshStandardMaterial color="#1e293b" roughness={0.15} metalness={0.35} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Vestíbulos extremos con puertas */}
+      {[-4.2, 4.2].map((dz, i) => (
+        <mesh key={`ddd-${i}`} position={[0, 1.56, dz]}>
+          <boxGeometry args={[2.47, 1.4, 1.05]} />
+          <meshStandardMaterial color="#0284c7" roughness={0.3} />
+        </mesh>
+      ))}
+
+      {/* Logo TBA lateral */}
+      <mesh position={[1.24, 1.68, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[1.4, 0.34]} />
+        <meshBasicMaterial map={tbaTex} />
+      </mesh>
+      <mesh position={[-1.24, 1.68, 0]} rotation={[0, -Math.PI / 2, 0]}>
+        <planeGeometry args={[1.4, 0.34]} />
+        <meshBasicMaterial map={tbaTex} />
+      </mesh>
+
+      {/* Techo blanco con unidades AC */}
+      <mesh position={[0, 2.75, 0]} castShadow>
+        <boxGeometry args={[2.3, 0.16, 11.0]} />
+        <meshStandardMaterial color="#f1f5f9" roughness={0.4} />
+      </mesh>
+      {[-3.4, 3.4].map((az, i) => (
+        <mesh key={`ddac-${i}`} position={[0, 2.88, az]} castShadow>
+          <boxGeometry args={[1.1, 0.14, 1.4]} />
+          <meshStandardMaterial color="#94a3b8" roughness={0.5} />
+        </mesh>
+      ))}
+
+      {/* Frente de cabina si es coche delantero */}
+      {isCabCar && (
+        <group position={[0, 0, 5.62]}>
+          <mesh position={[0, 1.75, 0.08]} castShadow>
+            <boxGeometry args={[2.44, 1.85, 0.2]} />
+            <meshStandardMaterial color="#f8fafc" roughness={0.3} />
+          </mesh>
+          <mesh position={[0, 1.85, 0.19]}>
+            <boxGeometry args={[1.8, 0.72, 0.05]} />
+            <meshStandardMaterial color="#0f172a" roughness={0.1} metalness={0.5} />
+          </mesh>
+          {[-0.82, 0.82].map((hx) => (
+            <mesh key={hx} position={[hx, 1.02, 0.19]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.09, 0.09, 0.04, 12]} />
+              <meshStandardMaterial color="#fef08a" emissive="#fde047" emissiveIntensity={2.2} />
+            </mesh>
+          ))}
+        </group>
+      )}
+    </group>
+  );
+}
+
+/**
+ * 02_tren_electrico_suburbano_3d.jpg - Tren Eléctrico Suburbano plateado con pantógrafo.
+ */
+function SuburbanElectricCar({ isCabCar, wheelRefs, wheelStartIdx }) {
+  return (
+    <group>
+      <Bogie z={3.6} wheelRefs={wheelRefs} wheelStartIdx={wheelStartIdx} />
+      <Bogie z={-3.6} wheelRefs={wheelRefs} wheelStartIdx={wheelStartIdx + 2} />
+
+      {/* Bastidor inferior */}
+      <mesh position={[0, 0.68, 0]} castShadow>
+        <boxGeometry args={[2.42, 0.38, 11.0]} />
+        <meshStandardMaterial color="#1e293b" roughness={0.6} />
+      </mesh>
+
+      {/* Carrocería plateada */}
+      <mesh position={[0, 1.66, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2.4, 1.56, 11.0]} />
+        <meshStandardMaterial color="#cbd5e1" metalness={0.45} roughness={0.28} />
+      </mesh>
+
+      {/* Banda oscura de ventanas y franja azul-gris inferior */}
+      <mesh position={[0, 1.78, 0]}>
+        <boxGeometry args={[2.42, 0.76, 10.6]} />
+        <meshStandardMaterial color="#1e293b" roughness={0.2} metalness={0.35} />
+      </mesh>
+      <mesh position={[0, 1.08, 0]}>
+        <boxGeometry args={[2.42, 0.18, 11.01]} />
+        <meshStandardMaterial color="#475569" roughness={0.4} />
+      </mesh>
+
+      {/* Puertas dobles plateadas */}
+      {[-2.8, 2.8].map((dz, i) => (
+        <mesh key={`sed-${i}`} position={[0, 1.58, dz]}>
+          <boxGeometry args={[2.44, 1.42, 1.25]} />
+          <meshStandardMaterial color="#e2e8f0" metalness={0.4} roughness={0.3} />
+        </mesh>
+      ))}
+
+      {/* Unidades AC y Pantógrafo en el techo */}
+      <mesh position={[0, 2.55, 0.6]} castShadow>
+        <boxGeometry args={[1.35, 0.22, 2.8]} />
+        <meshStandardMaterial color="#94a3b8" roughness={0.45} />
+      </mesh>
+      {!isCabCar && (
+        <group position={[0, 2.55, -2.6]}>
+          <mesh position={[0, 0.05, 0]}>
+            <boxGeometry args={[0.9, 0.08, 0.9]} />
+            <meshStandardMaterial color="#334155" metalness={0.7} />
+          </mesh>
+          <mesh position={[0, 0.36, -0.25]} rotation={[0.55, 0, 0]}>
+            <boxGeometry args={[0.06, 0.85, 0.06]} />
+            <meshStandardMaterial color="#1e293b" metalness={0.75} />
+          </mesh>
+          <mesh position={[0, 0.76, 0.05]}>
+            <boxGeometry args={[1.1, 0.05, 0.18]} />
+            <meshStandardMaterial color="#475569" metalness={0.8} />
+          </mesh>
+        </group>
+      )}
+
+      {/* Nariz aerodinámica del coche cabina */}
+      {isCabCar && (
+        <group position={[0, 0.7, 5.5]}>
+          <mesh position={[0, 0.88, 0.55]} rotation={[-0.28, 0, 0]} castShadow>
+            <boxGeometry args={[2.34, 1.55, 1.35]} />
+            <meshStandardMaterial color="#cbd5e1" metalness={0.45} roughness={0.28} />
+          </mesh>
+          <mesh position={[0, 1.05, 1.05]} rotation={[-0.28, 0, 0]}>
+            <boxGeometry args={[1.85, 0.82, 0.4]} />
+            <meshStandardMaterial color="#0f172a" roughness={0.1} metalness={0.5} />
+          </mesh>
+          {[-0.78, 0.78].map((hx) => (
+            <mesh key={hx} position={[hx, 0.52, 1.24]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.09, 0.09, 0.05, 12]} />
+              <meshStandardMaterial color="#fef08a" emissive="#fde047" emissiveIntensity={2.3} />
+            </mesh>
+          ))}
+        </group>
+      )}
+    </group>
+  );
+}
+
+/**
+ * 03_locomotora_diesel_electrica_3d.jpg + 04_coche_pasajeros_generico_3d.jpg
+ */
+function DieselLocomotiveUnit({ wheelRefs }) {
+  return (
+    <group>
+      <Bogie z={3.6} wheelRefs={wheelRefs} wheelStartIdx={0} />
+      <Bogie z={-3.6} wheelRefs={wheelRefs} wheelStartIdx={2} />
+
+      {/* Bastidor pesado + tanque de combustible */}
+      <mesh position={[0, 0.72, 0]} castShadow>
+        <boxGeometry args={[2.5, 0.34, 11.4]} />
+        <meshStandardMaterial color="#1e293b" roughness={0.65} />
+      </mesh>
+      <mesh position={[0, 0.45, 0]} castShadow>
+        <boxGeometry args={[1.7, 0.38, 3.8]} />
+        <meshStandardMaterial color="#334155" roughness={0.7} />
+      </mesh>
+
+      {/* Cuerpo largo gris oscuro */}
+      <mesh position={[0, 1.65, -0.9]} castShadow receiveShadow>
+        <boxGeometry args={[2.1, 1.56, 8.6]} />
+        <meshStandardMaterial color="#475569" roughness={0.55} metalness={0.3} />
+      </mesh>
+
+      {/* Cabina delantera elevada */}
+      <mesh position={[0, 1.75, 4.1]} castShadow receiveShadow>
+        <boxGeometry args={[2.38, 1.72, 2.1]} />
+        <meshStandardMaterial color="#475569" roughness={0.55} metalness={0.3} />
+      </mesh>
+
+      {/* Franja naranja característica */}
+      <mesh position={[0, 1.26, 0.1]}>
+        <boxGeometry args={[2.42, 0.24, 11.15]} />
+        <meshStandardMaterial color="#d97706" roughness={0.4} />
+      </mesh>
+
+      {/* Parabrisas dobles de la locomotora */}
+      {[-0.56, 0.56].map((wx) => (
+        <mesh key={wx} position={[wx, 2.1, 5.17]}>
+          <boxGeometry args={[0.78, 0.46, 0.05]} />
+          <meshStandardMaterial color="#0f172a" roughness={0.12} metalness={0.5} />
+        </mesh>
+      ))}
+      {/* Faros frontales */}
+      <mesh position={[0, 1.65, 5.17]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.12, 0.12, 0.04, 12]} />
+        <meshStandardMaterial color="#fef08a" emissive="#fde047" emissiveIntensity={2.4} />
+      </mesh>
+
+      {/* Ventiladores superiores */}
+      {[-3.6, -2.1, -0.6].map((fz, i) => (
+        <mesh key={`fan-${i}`} position={[0, 2.48, fz]}>
+          <cylinderGeometry args={[0.52, 0.52, 0.1, 16]} />
+          <meshStandardMaterial color="#1e293b" metalness={0.6} roughness={0.4} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function GenericSilverCoach({ wheelRefs, wheelStartIdx }) {
+  return (
+    <group>
+      <Bogie z={3.6} wheelRefs={wheelRefs} wheelStartIdx={wheelStartIdx} />
+      <Bogie z={-3.6} wheelRefs={wheelRefs} wheelStartIdx={wheelStartIdx + 2} />
+
+      <mesh position={[0, 0.72, 0]} castShadow>
+        <boxGeometry args={[2.42, 0.36, 11.2]} />
+        <meshStandardMaterial color="#1e293b" roughness={0.6} />
+      </mesh>
+      <mesh position={[0, 1.68, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2.4, 1.54, 11.2]} />
+        <meshStandardMaterial color="#e2e8f0" metalness={0.4} roughness={0.3} />
+      </mesh>
+      <mesh position={[0, 1.8, 0]}>
+        <boxGeometry args={[2.42, 0.62, 10.6]} />
+        <meshStandardMaterial color="#334155" roughness={0.25} />
+      </mesh>
+      {[-3.6, -2.4, -1.2, 0, 1.2, 2.4, 3.6].map((wz, i) => (
+        <mesh key={`gwin-${i}`} position={[0, 1.8, wz]}>
+          <boxGeometry args={[2.44, 0.44, 0.82]} />
+          <meshStandardMaterial color="#0f172a" roughness={0.12} metalness={0.4} />
+        </mesh>
+      ))}
+      {[-3.2, 3.2].map((az, i) => (
+        <mesh key={`gac-${i}`} position={[0, 2.55, az]} castShadow>
+          <boxGeometry args={[1.3, 0.2, 1.8]} />
+          <meshStandardMaterial color="#cbd5e1" roughness={0.45} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/**
+ * Modelo 3D del Tren activo (Sarmiento, Dos Pisos, Eléctrico Suburbano o Locomotora Diésel) animado en useFrame.
  */
 export default function Train() {
   const groupRef = useRef(null);
   const wheelRefs = useRef([]);
   const phase = useGameStore((s) => s.phase);
   const upgrades = useGameStore((s) => s.upgrades);
+  const selectedTrain = useGameStore((s) => s.selectedTrain);
   const onTrainArrived = useGameStore((s) => s.onTrainArrived);
   const onTrainDeparted = useGameStore((s) => s.onTrainDeparted);
 
@@ -308,6 +587,10 @@ export default function Train() {
     () => createTextTexture('Trenes Argentinos', '#f8fafc', '#0284c7', 256, 48, 'bold 26px sans-serif'),
     []
   );
+  const tbaTex = useMemo(
+    () => createTextTexture('TBA', '#0ea5e9', '#0f172a', 256, 64, 'bold 42px sans-serif'),
+    []
+  );
   const ledTex = useMemo(
     () => createTextTexture('SARMIENTO  •  M23', '#0f172a', '#7dd3fc', 256, 44, 'bold 20px monospace'),
     []
@@ -317,9 +600,10 @@ export default function Train() {
     return () => {
       chevronTex.dispose();
       logoTex.dispose();
+      tbaTex.dispose();
       ledTex.dispose();
     };
-  }, [chevronTex, logoTex, ledTex]);
+  }, [chevronTex, logoTex, tbaTex, ledTex]);
 
   useFrame((_state, delta) => {
     const group = groupRef.current;
@@ -370,46 +654,83 @@ export default function Train() {
 
   return (
     <group ref={groupRef} position={[0, 0.25, ENTRY_Z]}>
-      {/* Coche Cabina Delantero (M4 / M23) */}
-      <group position={[0, 0, 0]}>
-        <PassengerCarBody
-          length={11.2}
-          primaryBlue={primaryBlue}
-          stripeColor={stripeColor}
-          isCabCar={true}
-          chevronTex={chevronTex}
-          logoTex={logoTex}
-          ledTex={ledTex}
-        />
-        <Bogie z={3.6} wheelRefs={wheelRefs} wheelStartIdx={0} />
-        <Bogie z={-3.6} wheelRefs={wheelRefs} wheelStartIdx={2} />
-      </group>
+      {selectedTrain === 'double_decker' ? (
+        <>
+          <DoubleDeckerCar isCabCar={true} wheelRefs={wheelRefs} wheelStartIdx={0} tbaTex={tbaTex} />
+          <mesh position={[0, 1.55, -5.85]} castShadow>
+            <boxGeometry args={[1.45, 1.7, 0.6]} />
+            <meshStandardMaterial color="#0f172a" roughness={0.85} />
+          </mesh>
+          <group position={[0, 0, -11.7]}>
+            <DoubleDeckerCar isCabCar={false} wheelRefs={wheelRefs} wheelStartIdx={4} tbaTex={tbaTex} />
+          </group>
+        </>
+      ) : selectedTrain === 'suburban_electric' ? (
+        <>
+          <SuburbanElectricCar isCabCar={true} wheelRefs={wheelRefs} wheelStartIdx={0} />
+          <mesh position={[0, 1.48, -5.85]} castShadow>
+            <boxGeometry args={[1.45, 1.65, 0.6]} />
+            <meshStandardMaterial color="#0f172a" roughness={0.85} />
+          </mesh>
+          <group position={[0, 0, -11.7]}>
+            <SuburbanElectricCar isCabCar={false} wheelRefs={wheelRefs} wheelStartIdx={4} />
+          </group>
+        </>
+      ) : selectedTrain === 'diesel_express' ? (
+        <>
+          <DieselLocomotiveUnit wheelRefs={wheelRefs} />
+          <mesh position={[0, 1.35, -5.85]} castShadow>
+            <boxGeometry args={[1.4, 1.5, 0.6]} />
+            <meshStandardMaterial color="#0f172a" roughness={0.85} />
+          </mesh>
+          <group position={[0, 0, -11.7]}>
+            <GenericSilverCoach wheelRefs={wheelRefs} wheelStartIdx={4} />
+          </group>
+        </>
+      ) : (
+        <>
+          {/* Coche Cabina Delantero (M4 / M23) */}
+          <group position={[0, 0, 0]}>
+            <PassengerCarBody
+              length={11.2}
+              primaryBlue={primaryBlue}
+              stripeColor={stripeColor}
+              isCabCar={true}
+              chevronTex={chevronTex}
+              logoTex={logoTex}
+              ledTex={ledTex}
+            />
+            <Bogie z={3.6} wheelRefs={wheelRefs} wheelStartIdx={0} />
+            <Bogie z={-3.6} wheelRefs={wheelRefs} wheelStartIdx={2} />
+          </group>
 
-      {/* Fuelle negro de interconexión entre coches */}
-      <mesh position={[0, 1.48, -5.85]} castShadow>
-        <boxGeometry args={[1.45, 1.65, 0.6]} />
-        <meshStandardMaterial color="#0f172a" roughness={0.85} />
-      </mesh>
+          {/* Fuelle negro de interconexión entre coches */}
+          <mesh position={[0, 1.48, -5.85]} castShadow>
+            <boxGeometry args={[1.45, 1.65, 0.6]} />
+            <meshStandardMaterial color="#0f172a" roughness={0.85} />
+          </mesh>
 
-      {/* Segundo Coche de Pasajeros */}
-      <group position={[0, 0, -11.7]}>
-        <PassengerCarBody
-          length={11.2}
-          primaryBlue={primaryBlue}
-          stripeColor={stripeColor}
-          isCabCar={false}
-          chevronTex={chevronTex}
-          logoTex={logoTex}
-          ledTex={ledTex}
-        />
-        <Bogie z={3.6} wheelRefs={wheelRefs} wheelStartIdx={4} />
-        <Bogie z={-3.6} wheelRefs={wheelRefs} wheelStartIdx={6} />
-        {/* Fuelle trasero */}
-        <mesh position={[0, 1.48, -5.75]} castShadow>
-          <boxGeometry args={[1.45, 1.65, 0.35]} />
-          <meshStandardMaterial color="#0f172a" roughness={0.85} />
-        </mesh>
-      </group>
+          {/* Segundo Coche de Pasajeros */}
+          <group position={[0, 0, -11.7]}>
+            <PassengerCarBody
+              length={11.2}
+              primaryBlue={primaryBlue}
+              stripeColor={stripeColor}
+              isCabCar={false}
+              chevronTex={chevronTex}
+              logoTex={logoTex}
+              ledTex={ledTex}
+            />
+            <Bogie z={3.6} wheelRefs={wheelRefs} wheelStartIdx={4} />
+            <Bogie z={-3.6} wheelRefs={wheelRefs} wheelStartIdx={6} />
+            {/* Fuelle trasero */}
+            <mesh position={[0, 1.48, -5.75]} castShadow>
+              <boxGeometry args={[1.45, 1.65, 0.35]} />
+              <meshStandardMaterial color="#0f172a" roughness={0.85} />
+            </mesh>
+          </group>
+        </>
+      )}
     </group>
   );
 }

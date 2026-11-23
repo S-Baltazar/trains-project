@@ -19,6 +19,9 @@ export const useGameStore = create((set, get) => ({
   totalCorrect: 0,
   upgrades: [],
   catalog: [],
+  unlockedTrains: ['sarmiento'],
+  selectedTrain: 'sarmiento',
+  trainsCatalog: [],
   serverOnline: true,
 
   // Trivia actual
@@ -33,6 +36,7 @@ export const useGameStore = create((set, get) => ({
 
   // UI
   shopOpen: false,
+  trainShopOpen: false,
   toast: null,
 
   getWaitDurationMs: () => {
@@ -46,7 +50,9 @@ export const useGameStore = create((set, get) => ({
 
   clearToast: () => set({ toast: null }),
 
-  setShopOpen: (shopOpen) => set({ shopOpen }),
+  setShopOpen: (shopOpen) => set({ shopOpen, trainShopOpen: false }),
+
+  setTrainShopOpen: (trainShopOpen) => set({ trainShopOpen, shopOpen: false }),
 
   fetchStation: async () => {
     try {
@@ -61,6 +67,9 @@ export const useGameStore = create((set, get) => ({
         totalCorrect: data.totalCorrect,
         upgrades: data.upgrades,
         catalog: data.catalog,
+        unlockedTrains: data.unlockedTrains || ['sarmiento'],
+        selectedTrain: data.selectedTrain || 'sarmiento',
+        trainsCatalog: data.trainsCatalog || [],
         serverOnline: true,
       });
     } catch {
@@ -198,6 +207,60 @@ export const useGameStore = create((set, get) => ({
       get().showToast(`¡Mejora desbloqueada: ${data.purchased.name}!`, 'success');
     } catch {
       get().showToast('Error de conexión al comprar mejora', 'error');
+    }
+  },
+
+  selectOrBuyTrain: async (trainId) => {
+    try {
+      const res = await fetch('/api/station/train', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trainId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        get().showToast(data.error || 'No se pudo seleccionar el tren', 'error');
+        return;
+      }
+
+      set({
+        coins: data.coins,
+        unlockedTrains: data.unlockedTrains,
+        selectedTrain: data.selectedTrain,
+        trainsCatalog: data.trainsCatalog,
+      });
+      if (data.purchased) {
+        get().showToast(`¡Tren adquirido y en servicio: ${data.purchased.name}!`, 'success');
+      } else {
+        get().showToast(`Tren en servicio: ${data.selected.name}`, 'success');
+      }
+    } catch {
+      get().showToast('Error de conexión al cambiar de tren', 'error');
+    }
+  },
+
+  resetStation: async () => {
+    try {
+      const res = await fetch('/api/station/reset', { method: 'POST' });
+      if (!res.ok) throw new Error('No se pudo reiniciar la estación');
+      const data = await res.json();
+      set({
+        coins: data.coins,
+        streak: data.streak,
+        bestStreak: data.bestStreak,
+        totalAnswered: data.totalAnswered,
+        totalCorrect: data.totalCorrect,
+        upgrades: data.upgrades,
+        catalog: data.catalog,
+        unlockedTrains: data.unlockedTrains || ['sarmiento'],
+        selectedTrain: data.selectedTrain || 'sarmiento',
+        trainsCatalog: data.trainsCatalog || [],
+        shopOpen: false,
+        trainShopOpen: false,
+      });
+      get().showToast('Estación reiniciada desde cero', 'success');
+    } catch {
+      get().showToast('Error al reiniciar la estación', 'error');
     }
   },
 }));

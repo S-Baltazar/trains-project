@@ -103,6 +103,37 @@ const UPGRADE_CATALOG = [
   },
 ];
 
+const TRAIN_CATALOG = [
+  {
+    id: 'sarmiento',
+    name: 'Tren Sarmiento Clásico',
+    description: 'Formación eléctrica celeste y blanca tradicional de dos coches.',
+    cost: 0,
+    icon: '🚆',
+  },
+  {
+    id: 'double_decker',
+    name: 'Tren Dos Pisos (TBA)',
+    description: 'Coche doble piso blanco y celeste con gran capacidad de pasajeros.',
+    cost: 120,
+    icon: '🚈',
+  },
+  {
+    id: 'suburban_electric',
+    name: 'Tren Eléctrico Suburbano',
+    description: 'Formación aerodinámica plateada con pantógrafo y aire acondicionado.',
+    cost: 175,
+    icon: '🚄',
+  },
+  {
+    id: 'diesel_express',
+    name: 'Locomotora Diésel + Coche',
+    description: 'Locomotora diésel-eléctrica gris y naranja tirando coche de pasajeros.',
+    cost: 230,
+    icon: '🚂',
+  },
+];
+
 const DEFAULT_STATE = {
   coins: 25,
   streak: 0,
@@ -110,6 +141,8 @@ const DEFAULT_STATE = {
   totalAnswered: 0,
   totalCorrect: 0,
   upgrades: [],
+  unlockedTrains: ['sarmiento'],
+  selectedTrain: 'sarmiento',
 };
 
 function loadQuestions() {
@@ -135,6 +168,9 @@ function saveState(state) {
 }
 
 function buildStationPayload(state) {
+  const unlockedTrains = state.unlockedTrains || ['sarmiento'];
+  const selectedTrain = state.selectedTrain || 'sarmiento';
+
   return {
     coins: state.coins,
     streak: state.streak,
@@ -145,6 +181,13 @@ function buildStationPayload(state) {
     catalog: UPGRADE_CATALOG.map((item) => ({
       ...item,
       unlocked: state.upgrades.includes(item.id),
+    })),
+    unlockedTrains,
+    selectedTrain,
+    trainsCatalog: TRAIN_CATALOG.map((train) => ({
+      ...train,
+      unlocked: unlockedTrains.includes(train.id),
+      selected: selectedTrain === train.id,
     })),
   };
 }
@@ -248,6 +291,39 @@ app.post('/api/station/upgrade', (req, res) => {
 
   res.json({
     purchased: item,
+    ...buildStationPayload(state),
+  });
+});
+
+app.post('/api/station/train', (req, res) => {
+  const { trainId } = req.body ?? {};
+  const train = TRAIN_CATALOG.find((t) => t.id === trainId);
+
+  if (!train) {
+    return res.status(404).json({ error: 'Tren no encontrado' });
+  }
+
+  const state = loadState();
+  if (!Array.isArray(state.unlockedTrains) || state.unlockedTrains.length === 0) {
+    state.unlockedTrains = ['sarmiento'];
+  }
+
+  let purchased = null;
+  if (!state.unlockedTrains.includes(trainId)) {
+    if (state.coins < train.cost) {
+      return res.status(400).json({ error: 'Monedas insuficientes para comprar este tren' });
+    }
+    state.coins -= train.cost;
+    state.unlockedTrains.push(trainId);
+    purchased = train;
+  }
+
+  state.selectedTrain = trainId;
+  saveState(state);
+
+  res.json({
+    purchased,
+    selected: train,
     ...buildStationPayload(state),
   });
 });

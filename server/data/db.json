@@ -1,9 +1,9 @@
 {
-  "coins": 1057,
+  "coins": 1382,
   "streak": 0,
   "bestStreak": 18,
-  "totalAnswered": 66,
-  "totalCorrect": 52,
+  "totalAnswered": 80,
+  "totalCorrect": 60,
   "upgrades": [
     "benches",
     "lamps",
@@ -17,5 +17,9 @@
     "turnstiles",
     "bookstore",
     "flower_shop"
-  ]
+  ],
+  "unlockedTrains": [
+    "sarmiento"
+  ],
+  "selectedTrain": "sarmiento"
 }

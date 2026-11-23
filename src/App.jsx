@@ -3,6 +3,7 @@ import StationCanvas from './components/StationCanvas.jsx';
 import HUD from './components/HUD.jsx';
 import TriviaModal from './components/TriviaModal.jsx';
 import UpgradeShop from './components/UpgradeShop.jsx';
+import TrainShopModal from './components/TrainShopModal.jsx';
 import { useGameStore } from './store/gameStore.js';
 import './App.css';
 
@@ -30,6 +31,7 @@ export default function App() {
       <HUD />
       <TriviaModal />
       <UpgradeShop />
+      <TrainShopModal />
 
       {toast && (
         <div className={`toast ${toast.type}`}>

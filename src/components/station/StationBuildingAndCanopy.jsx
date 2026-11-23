@@ -182,18 +182,35 @@ export default function StationBuildingAndCanopy() {
         <meshStandardMaterial color="#1e3a2f" roughness={0.95} />
       </mesh>
 
-      {/* Balasto de vía con textura de piedra */}
-      <mesh position={[0, 0.06, 0]} receiveShadow>
-        <boxGeometry args={[3.9, 0.14, 150]} />
+      {/* Losa base de hormigón bajo la vía (05_via_ferrea_recta_3d.jpg) */}
+      <mesh position={[0, 0.01, 0]} receiveShadow>
+        <boxGeometry args={[4.6, 0.05, 150]} />
+        <meshStandardMaterial color="#94a3b8" roughness={0.9} />
+      </mesh>
+
+      {/* Balasto de vía con textura de granito partida (05_via_ferrea_recta_3d.jpg) */}
+      <mesh position={[0, 0.07, 0]} receiveShadow>
+        <boxGeometry args={[3.9, 0.12, 150]} />
         <meshStandardMaterial map={ballastTex} roughness={0.95} />
       </mesh>
 
-      {/* Durmientes de madera */}
-      {sleeperPositions.map((z) => (
-        <mesh key={z} position={[0, 0.15, z]} receiveShadow>
-          <boxGeometry args={[2.8, 0.08, 0.32]} />
-          <meshStandardMaterial color="#4e3422" roughness={0.88} />
-        </mesh>
+      {/* Durmientes alternados de hormigón y madera + fijaciones metálicas */}
+      {sleeperPositions.map((z, idx) => (
+        <group key={z} position={[0, 0.15, z]}>
+          <mesh receiveShadow>
+            <boxGeometry args={[2.8, 0.08, 0.32]} />
+            <meshStandardMaterial
+              color={idx % 3 === 0 ? '#7c5836' : '#cbd5e1'}
+              roughness={idx % 3 === 0 ? 0.85 : 0.78}
+            />
+          </mesh>
+          {[-1.0, 1.0].map((fx) => (
+            <mesh key={fx} position={[fx, 0.045, 0]}>
+              <boxGeometry args={[0.22, 0.02, 0.24]} />
+              <meshStandardMaterial color="#334155" metalness={0.6} roughness={0.45} />
+            </mesh>
+          ))}
+        </group>
       ))}
 
       {/* Rieles metálicos */}
@@ -203,6 +220,35 @@ export default function StationBuildingAndCanopy() {
           <meshStandardMaterial color="#cbd5e1" metalness={0.82} roughness={0.25} />
         </mesh>
       ))}
+
+      {/* Postes de catenaria y cable aéreo (06_cambio_via_y_catenaria_3d.jpg) */}
+      {[-36, -18, 0, 18, 36].map((cz) => (
+        <group key={`cat-${cz}`} position={[-2.45, 0, cz]}>
+          <mesh position={[0, 0.12, 0]} castShadow receiveShadow>
+            <boxGeometry args={[0.42, 0.24, 0.42]} />
+            <meshStandardMaterial color="#94a3b8" roughness={0.85} />
+          </mesh>
+          <mesh position={[0, 2.65, 0]} castShadow>
+            <boxGeometry args={[0.16, 4.9, 0.16]} />
+            <meshStandardMaterial color="#1e2228" metalness={0.7} roughness={0.35} />
+          </mesh>
+          {/* Brazo ménsula superior */}
+          <mesh position={[1.25, 4.75, 0]}>
+            <boxGeometry args={[2.5, 0.06, 0.06]} />
+            <meshStandardMaterial color="#1e2228" metalness={0.7} roughness={0.35} />
+          </mesh>
+          {/* Tirante diagonal */}
+          <mesh position={[1.15, 4.25, 0]} rotation={[0, 0, 0.42]}>
+            <boxGeometry args={[2.4, 0.05, 0.05]} />
+            <meshStandardMaterial color="#1e2228" metalness={0.7} roughness={0.35} />
+          </mesh>
+        </group>
+      ))}
+      {/* Cable de contacto de catenaria */}
+      <mesh position={[0, 4.55, 0]}>
+        <boxGeometry args={[0.025, 0.025, 140]} />
+        <meshStandardMaterial color="#475569" metalness={0.8} roughness={0.3} />
+      </mesh>
 
       {/* ANDÉN PRINCIPAL (06_modulo_anden_3d.jpg: subestructura oscura + losa clara en voladizo) */}
       <mesh position={[5.8, 0.38, 0]} receiveShadow castShadow>

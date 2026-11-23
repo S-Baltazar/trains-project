@@ -16,9 +16,12 @@ export default function HUD() {
   const streak = useGameStore((s) => s.streak);
   const bestStreak = useGameStore((s) => s.bestStreak);
   const catalog = useGameStore((s) => s.catalog);
+  const trainsCatalog = useGameStore((s) => s.trainsCatalog);
   const serverOnline = useGameStore((s) => s.serverOnline);
   const summonTrainNow = useGameStore((s) => s.summonTrainNow);
   const setShopOpen = useGameStore((s) => s.setShopOpen);
+  const setTrainShopOpen = useGameStore((s) => s.setTrainShopOpen);
+  const resetStation = useGameStore((s) => s.resetStation);
 
   const [secondsLeft, setSecondsLeft] = useState(30);
 
@@ -34,6 +37,13 @@ export default function HUD() {
   }, [phase, waitEndsAt]);
 
   const affordableCount = catalog.filter((u) => !u.unlocked && coins >= u.cost).length;
+  const affordableTrainsCount = trainsCatalog.filter((t) => !t.unlocked && coins >= t.cost).length;
+
+  const handleReset = () => {
+    if (window.confirm('¿Reiniciar la estación y empezar de 0? Se perderán tus monedas, mejoras y trenes comprados.')) {
+      resetStation();
+    }
+  };
 
   return (
     <>
@@ -72,9 +82,16 @@ export default function HUD() {
       </header>
 
       <div className="hud-actions">
+        <button className="btn-shop" onClick={() => setTrainShopOpen(true)}>
+          🚆 Elegir Tren
+          {affordableTrainsCount > 0 && <span className="badge">{affordableTrainsCount}</span>}
+        </button>
         <button className="btn-shop" onClick={() => setShopOpen(true)}>
           🛠️ Mejorar Estación
           {affordableCount > 0 && <span className="badge">{affordableCount}</span>}
+        </button>
+        <button className="btn-shop btn-reset" onClick={handleReset} title="Reiniciar estación desde 0">
+          🔄 Reiniciar Estación
         </button>
       </div>
     </>

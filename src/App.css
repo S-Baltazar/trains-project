@@ -142,12 +142,39 @@
   color: #94a3b8;
 }
 
-/* Botón Tienda */
+/* Botones de Acción Superiores */
 .hud-actions {
   position: absolute;
   top: 1rem;
   right: 1rem;
   z-index: 10;
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.btn-reset {
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fecaca;
+}
+
+.btn-reset:hover {
+  border-color: #ef4444;
+}
+
+.btn-select {
+  padding: 0.5rem 0.9rem;
+  font-weight: 700;
+  border-radius: 8px;
+  border: none;
+  background: #38bdf8;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+.btn-select:hover {
+  background: #7dd3fc;
 }
 
 .btn-shop {
