@@ -66,6 +66,7 @@ export default function HUD() {
   const resetStation = useGameStore((s) => s.resetStation);
 
   const [secondsLeft, setSecondsLeft] = useState(30);
+  const [hudCollapsed, setHudCollapsed] = useState(false);
 
   useEffect(() => {
     if (phase !== 'WAITING') return;
@@ -122,73 +123,87 @@ export default function HUD() {
               Nv. {stationLevel.level} • {stationLevel.title} • 😊 {satisfaction.percent}% (x{satisfaction.multiplier})
             </span>
           </div>
-          <span className={`dot ${serverOnline ? 'online' : 'offline'}`} title={serverOnline ? 'Backend conectado' : 'Backend desconectado'} />
-        </div>
-
-        <div className="stats-grid">
-          <div className="stat-pill coins">
-            <span>🪙</span>
-            <strong>{coins}</strong>
-            <small>Monedas {passiveIncomePerTrain > 0 ? `(+${passiveIncomePerTrain}/tren)` : ''}</small>
-          </div>
-          <div className="stat-pill streak">
-            <span>🔥</span>
-            <strong>{streak}</strong>
-            <small>Racha (Máx {bestStreak})</small>
-          </div>
-        </div>
-
-        <div className="difficulty-row" title="Dificultad de la trivia">
-          {DIFFICULTIES.map((d) => (
+          <div className="hud-header-controls">
             <button
-              key={d}
-              className={`diff-pill ${difficulty === d ? 'active' : ''}`}
-              onClick={() => setDifficulty(d)}
+              className="btn-collapse"
+              onClick={() => setHudCollapsed((v) => !v)}
+              title={hudCollapsed ? 'Expandir panel' : 'Minimizar panel'}
+              aria-label="Alternar panel"
             >
-              {d}
+              {hudCollapsed ? '▾' : '▴'}
             </button>
-          ))}
+            <span className={`dot ${serverOnline ? 'online' : 'offline'}`} title={serverOnline ? 'Backend conectado' : 'Backend desconectado'} />
+          </div>
         </div>
 
-        <div className="phase-box">
-          <span className="phase-label">
-            {blitzActive ? '⚡ Modo Contrarreloj (60s)' : PHASE_LABELS[phase]}
-          </span>
-          {phase === 'WAITING' && (
-            <div className="countdown-row">
-              <span className="countdown-time">⏱️ {secondsLeft}s</span>
-              <button className="btn-secondary" onClick={summonTrainNow}>
-                🚄 Llamar tren
+        {!hudCollapsed && (
+          <>
+            <div className="stats-grid">
+              <div className="stat-pill coins">
+                <span>🪙</span>
+                <strong>{coins}</strong>
+                <small>Monedas {passiveIncomePerTrain > 0 ? `(+${passiveIncomePerTrain}/tren)` : ''}</small>
+              </div>
+              <div className="stat-pill streak">
+                <span>🔥</span>
+                <strong>{streak}</strong>
+                <small>Racha (Máx {bestStreak})</small>
+              </div>
+            </div>
+
+            <div className="difficulty-row" title="Dificultad de la trivia">
+              {DIFFICULTIES.map((d) => (
+                <button
+                  key={d}
+                  className={`diff-pill ${difficulty === d ? 'active' : ''}`}
+                  onClick={() => setDifficulty(d)}
+                >
+                  {d}
+                </button>
+              ))}
+            </div>
+
+            <div className="phase-box">
+              <span className="phase-label">
+                {blitzActive ? '⚡ Modo Contrarreloj (60s)' : PHASE_LABELS[phase]}
+              </span>
+              {phase === 'WAITING' && (
+                <div className="countdown-row">
+                  <span className="countdown-time">⏱️ {secondsLeft}s</span>
+                  <button className="btn-secondary" onClick={summonTrainNow}>
+                    🚄 Llamar tren
+                  </button>
+                  <button className="btn-secondary" onClick={startBlitz} title="Responder preguntas en ráfaga durante 60s">
+                    ⚡ 60s
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="hud-toolbar">
+              <button className="btn-mini" onClick={cycleTimeOfDay} title="Cambiar momento del día">
+                {TIME_LABELS[timeOfDay]}
               </button>
-              <button className="btn-secondary" onClick={startBlitz} title="Responder preguntas en ráfaga durante 60s">
-                ⚡ 60s
+              <button className="btn-mini" onClick={cycleWeather} title="Cambiar clima / evento">
+                {WEATHER_LABELS[weatherEvent]}
+              </button>
+              {CAMERA_PRESETS.map((cam) => (
+                <button
+                  key={cam.id}
+                  className={`btn-mini ${cameraPreset === cam.id ? 'active' : ''}`}
+                  onClick={() => setCameraPreset(cam.id)}
+                >
+                  {cam.label}
+                </button>
+              ))}
+              <button className="btn-mini" onClick={toggleMuted} title="Silenciar o activar sonido">
+                {muted ? '🔇' : '🔊'}
               </button>
             </div>
-          )}
-        </div>
 
-        <div className="hud-toolbar">
-          <button className="btn-mini" onClick={cycleTimeOfDay} title="Cambiar momento del día">
-            {TIME_LABELS[timeOfDay]}
-          </button>
-          <button className="btn-mini" onClick={cycleWeather} title="Cambiar clima / evento">
-            {WEATHER_LABELS[weatherEvent]}
-          </button>
-          {CAMERA_PRESETS.map((cam) => (
-            <button
-              key={cam.id}
-              className={`btn-mini ${cameraPreset === cam.id ? 'active' : ''}`}
-              onClick={() => setCameraPreset(cam.id)}
-            >
-              {cam.label}
-            </button>
-          ))}
-          <button className="btn-mini" onClick={toggleMuted} title="Silenciar o activar sonido">
-            {muted ? '🔇' : '🔊'}
-          </button>
-        </div>
-
-        <p className="controls-hint">Flechas: mover cámara • Arrastra: rotar • 1-4: trivia</p>
+            <p className="controls-hint">Flechas: mover cámara • Arrastra: rotar • 1-4: trivia</p>
+          </>
+        )}
       </header>
 
       <div className="hud-actions">
