@@ -1,9 +1,9 @@
 {
-  "coins": 10516,
-  "streak": 3,
+  "coins": 11617,
+  "streak": 2,
   "bestStreak": 3,
-  "totalAnswered": 3,
-  "totalCorrect": 3,
+  "totalAnswered": 17,
+  "totalCorrect": 7,
   "upgrades": [
     "benches",
     "bench_curved",
@@ -16,7 +16,10 @@
     "turnstiles",
     "bookstore",
     "flower_shop",
-    "express_train"
+    "express_train",
+    "exterior_plaza",
+    "substation",
+    "second_platform"
   ],
   "unlockedTrains": [
     "sarmiento",
